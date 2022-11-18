@@ -87,6 +87,7 @@ cloud:
 url:
   avatar: AI_AVATAR
   lifing: AI_LIFING
+  friend: AI_FRIEND
 
 mybatis:
   mapper-locations: mybatis/**/*.xml
