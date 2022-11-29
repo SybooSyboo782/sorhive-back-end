@@ -25,6 +25,6 @@ public class GuestBookCreateRequestDto {
     private Long roomId;
 
     @NotNull
-    private String content;
+    private String guestBookContent;
 
 }

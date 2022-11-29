@@ -1,7 +1,6 @@
 package com.sorhive.comprojectserver.lifing.command.application.dto;
 
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * <pre>
@@ -19,7 +18,6 @@ import lombok.Setter;
  * @see (참고할 class 또는 외부 url)
  */
 @Getter
-@Setter
 public class LifingCommentCreateDto {
 
     private String lifingCommentContent;

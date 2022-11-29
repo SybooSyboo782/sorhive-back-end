@@ -1,9 +1,6 @@
 package com.sorhive.comprojectserver.room.command.application.dto;
 
 import lombok.Getter;
-import lombok.Setter;
-
-import java.util.List;
 
 /**
  * <pre>
@@ -21,10 +18,11 @@ import java.util.List;
  * @see (참고할 class 또는 외부 url)
  */
 @Getter
-@Setter
 public class FurnitureImageCreateRequestDto {
 
     private Long roomId;
-    private List<FurnitureImageRequestDto> furnitureImages;
+    byte[] furnitureImage;
+    Integer furnitureImageNo;
+    String furnitureImageName;
 
 }

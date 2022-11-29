@@ -19,7 +19,7 @@
     <resultMap id="feedImageResultMap" type="com.sorhive.comprojectserver.feed.query.dto.FeedImageSummary">
         <id property="feedImageId" column="feed_image_id"/>
         <result property="feedImagePath" column="feed_image_path"/>
-        <result property="feedImageOriginalName" column="feed_original_name"/>
+        <result property="feedImageOriginalName" column="feed_image_original_name"/>
     </resultMap>
 
     <resultMap id="feedCommentResultMap" type="com.sorhive.comprojectserver.feed.query.dto.FeedCommentSummary">
@@ -42,9 +42,9 @@
              , b.feed_image_path
           from tbl_feeds a
           left join tbl_feed_images b on(a.feed_id = b.feed_id)
-         where feed_writer_code = #{memberCode}
+         where a.feed_writer_code = #{memberCode}
            and a.feed_delete_yn = 'N'
-         order by feed_id desc
+         order by a.feed_id desc
          limit 5 offset #{ pageNo }
     </select>
 
@@ -57,8 +57,8 @@
              , feed_create_time
              , feed_delete_yn
           from tbl_feeds
-         where feed_id = #{feedId};
-           and a.feed_delete_yn = 'N'
+         where feed_id = #{feedId}
+           and feed_delete_yn = 'N'
     </select>
 
     <select id="selectAllFeedComments" resultMap="feedCommentResultMap">
@@ -71,7 +71,7 @@
              , feed_comment_delete_yn
           from tbl_feed_comments
          where feed_id = #{feedId}
-           and a.feed_delete_yn = 'N'
+           and feed_comment_delete_yn = 'N'
          order by feed_comment_id desc
     </select>
 
@@ -79,10 +79,10 @@
         select
                feed_image_id
              , feed_image_path
-             , feed_original_name
+             , feed_image_original_name
           from tbl_feed_images
          where feed_id = #{feedId}
-           and a.feed_delete_yn = 'N'
+           and feed_image_delete_yn = 'N'
     </select>
 
     <select id="selectFeedCount" resultType="_int">
@@ -90,7 +90,7 @@
                count(feed_writer_code) as feedCount
           from tbl_feeds
          where feed_writer_code = #{memberCode}
-           and a.feed_delete_yn = 'N'
+           and feed_delete_yn = 'N'
     </select>
 
 </mapper>

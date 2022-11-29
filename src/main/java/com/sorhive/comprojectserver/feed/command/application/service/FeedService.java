@@ -1,12 +1,9 @@
 package com.sorhive.comprojectserver.feed.command.application.service;
 
 import com.sorhive.comprojectserver.common.exception.AlreadyDeleteException;
+import com.sorhive.comprojectserver.common.exception.NotSameWriterException;
 import com.sorhive.comprojectserver.config.jwt.TokenProvider;
-import com.sorhive.comprojectserver.feed.command.application.dto.FeedCommentCreateDto;
-import com.sorhive.comprojectserver.feed.command.application.dto.ResponseFeedCommentDto;
-import com.sorhive.comprojectserver.feed.command.application.dto.ResponseFeedHoneyCreateDto;
-import com.sorhive.comprojectserver.feed.command.application.dto.ResponseFeedHoneyDeleteDto;
-import com.sorhive.comprojectserver.feed.command.application.exception.NoFeedException;
+import com.sorhive.comprojectserver.feed.command.application.dto.*;
 import com.sorhive.comprojectserver.feed.command.domain.model.feed.Feed;
 import com.sorhive.comprojectserver.feed.command.domain.model.feed.FeedId;
 import com.sorhive.comprojectserver.feed.command.domain.model.feedcomment.FeedComment;
@@ -16,6 +13,8 @@ import com.sorhive.comprojectserver.feed.command.domain.model.feedhoney.FeedHone
 import com.sorhive.comprojectserver.feed.command.domain.repository.FeedCommentRepository;
 import com.sorhive.comprojectserver.feed.command.domain.repository.FeedHoneyRepository;
 import com.sorhive.comprojectserver.feed.command.domain.repository.FeedRepository;
+import com.sorhive.comprojectserver.feed.exception.NoFeedCommentException;
+import com.sorhive.comprojectserver.feed.exception.NoFeedException;
 import com.sorhive.comprojectserver.lifing.command.application.exception.AlreadyHoneyException;
 import com.sorhive.comprojectserver.member.command.domain.model.member.MemberCode;
 import org.slf4j.Logger;
@@ -28,15 +27,17 @@ import java.util.Optional;
 /**
  * <pre>
  * Class : FeedService
- * Comment: 클래스에 대한 간단 설명
+ * Comment: 피드 서비스
  * History
  * ================================================================
  * DATE             AUTHOR           NOTE
  * ----------------------------------------------------------------
  * 2022-11-12       부시연           최초 생성
- * 2022-11-12       부시연           피드 댓글 추가 기능 생성
+ * 2022-11-12       부시연           피드 댓글 추가 기능 추가
  * 2022-11-16       부시연           피드 허니 추가 기능 추가
  * 2022-11-16       부시연           피드 허니 제거 기능 추가
+ * 2022-11-19       부시연           피드 댓글 삭제 기능 추가
+ * 2022-11-19       부시연           피드 댓글 수정 기능 추가
  * </pre>
  *
  * @author 부시연(최초 작성자)
@@ -60,18 +61,18 @@ public class FeedService {
         this.feedCommentWriterService = feedCommentWriterService;
     }
 
-    /* 피드 댓글 작성 */
+    /** 피드 댓글 작성 */
     @Transactional
-    public ResponseFeedCommentDto createFeedComment(String accessToken, Long feedId, FeedCommentCreateDto feedCommentCreateDto) {
+    public FeedCommentCreateResponseDto createFeedComment(String accessToken, Long feedId, FeedCommentCreateRequestDto feedCommentCreateRequestDto) {
 
         log.info("[FeedService] createFeedComment Start =========================================================");
-        log.info("[FeedService] feedCommentCreateDto : " + feedCommentCreateDto);
+        log.info("[FeedService] feedCommentCreateDto : " + feedCommentCreateRequestDto);
 
         Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
 
         FeedCommentWriter feedCommentWriter = feedCommentWriterService.createFeedCommentWriter(new MemberCode(memberCode));
 
-        String feedCommentContent = feedCommentCreateDto.getFeedCommentContent();
+        String feedCommentContent = feedCommentCreateRequestDto.getFeedCommentContent();
 
         Feed feed = feedRepository.findByFeedId(feedId);
 
@@ -87,18 +88,110 @@ public class FeedService {
 
         feedCommentRepository.save(feedComment);
 
-        ResponseFeedCommentDto responseFeedCommentDto = new ResponseFeedCommentDto();
-        responseFeedCommentDto.setFeedCommentId(feedComment.getId());
-        responseFeedCommentDto.setFeedCommentcontent(feedComment.getContent());
-        responseFeedCommentDto.setFeedCommentCreateTime(feedComment.getCreateTime());
+        FeedCommentCreateResponseDto feedCommentCreateResponseDto =
+                new FeedCommentCreateResponseDto(
+                        feedComment.getId(),
+                        feedComment.getContent(),
+                        feedComment.getCreateTime()
+                );
 
-        return responseFeedCommentDto;
+        return feedCommentCreateResponseDto;
 
     }
 
-    /* 허니 추가 */
+    /** 피드 댓글 수정 */
+    public Object modifyFeedComment(String accessToken, Long feedCommentId, FeedCommentModifyRequestDto feedCommentModifyRequestDto) {
+
+        log.info("[FeedService] modifyFeedComment Start =========================================================");
+        log.info("[FeedService] feedCommentId : " + feedCommentId);
+        log.info("[FeedService] feedCommentModifyRequestDto : " + feedCommentModifyRequestDto);
+
+        Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
+
+        if(feedCommentRepository.findById(feedCommentId) == null) {
+
+            log.warn("[FeedService] NoFeedCommentExecption");
+            throw new NoFeedCommentException("해당 피드 댓글은 존재하지 않습니다.");
+
+        }
+
+        if(feedCommentRepository.findByIdAndDeleteYnEquals(feedCommentId, 'N').isEmpty()) {
+
+            log.warn("[FeedService] NoFeedCommentExecption");
+            throw new NoFeedCommentException("해당 피드 댓글은 이미 삭제 되었습니다.");
+
+        }
+
+        Optional<FeedComment> feedCommentData = feedCommentRepository.findByIdAndDeleteYnEquals(feedCommentId, 'N');
+
+        if(feedCommentData.get().getFeedCommentWriter().getMemberCode().getValue() != memberCode) {
+
+            log.warn("[FeedService] NotSameWriterException");
+            throw new NotSameWriterException("해당 피드 댓글의 작성자가 아닙니다.");
+
+        }
+
+        FeedComment feedComment = feedCommentData.get();
+
+        feedComment.modifyFeedComment(feedCommentId, feedCommentModifyRequestDto.getFeedCommentContent());
+
+        feedCommentRepository.save(feedComment);
+
+        FeedCommentModifyResponseDto feedCommentModifyResponseDto = new FeedCommentModifyResponseDto(
+                feedComment.getId(),
+                feedComment.getContent(),
+                feedComment.getUploadTime()
+        );
+
+        return feedCommentModifyResponseDto;
+
+    }
+
+    /** 피드 댓글 삭제 */
     @Transactional
-    public ResponseFeedHoneyCreateDto createFeedHoney(String accessToken, Long feedId) {
+    public Long deleteFeedComment(String accessToken, Long feedCommentId) {
+
+        log.info("[FeedService] deleteFeedComment Start =========================================================");
+        log.info("[FeedService] feedCommentId : " + feedCommentId);
+
+        Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
+
+        if(feedCommentRepository.findById(feedCommentId) == null) {
+
+            log.warn("[FeedService] NoFeedCommentExecption");
+            throw new NoFeedCommentException("해당 피드 댓글은 존재하지 않습니다.");
+
+        }
+
+        if(feedCommentRepository.findByIdAndDeleteYnEquals(feedCommentId, 'N').isEmpty()) {
+
+            log.warn("[FeedService] NoFeedCommentExecption");
+            throw new NoFeedCommentException("해당 피드 댓글은 이미 삭제 되었습니다.");
+
+        }
+
+        Optional<FeedComment> feedCommentData = feedCommentRepository.findByIdAndDeleteYnEquals(feedCommentId, 'N');
+
+        if(feedCommentData.get().getFeedCommentWriter().getMemberCode().getValue() != memberCode) {
+
+            log.warn("[FeedService] NotSameWriterException");
+            throw new NotSameWriterException("해당 피드 댓글의 작성자가 아닙니다.");
+
+        }
+
+        FeedComment feedComment = feedCommentData.get();
+
+        feedComment.deleteFeedComment(feedCommentId);
+
+        feedCommentRepository.save(feedComment);
+
+        return feedComment.getId();
+
+    }
+
+    /** 허니 추가 */
+    @Transactional
+    public FeedHoneyResponseCreateDto createFeedHoney(String accessToken, Long feedId) {
 
         log.info("[FeedService] createFeedHoney Start =========================================================");
         log.info("[FeedService] feedId : " + feedId);
@@ -126,19 +219,20 @@ public class FeedService {
 
         feedHoneyRepository.save(feedHoney);
 
-        ResponseFeedHoneyCreateDto responseFeedHoneyCreateDto = new ResponseFeedHoneyCreateDto();
-        responseFeedHoneyCreateDto.setFeedHoneyId(feedHoney.getId());
-        responseFeedHoneyCreateDto.setFeedId(feedHoney.getFeedId().getValue());
-        responseFeedHoneyCreateDto.setMemberCode(feedHoney.getMemberCode().getValue());
-        responseFeedHoneyCreateDto.setCreateTime(feedHoney.getCreateTime());
+        FeedHoneyResponseCreateDto feedHoneyResponseCreateDto = new FeedHoneyResponseCreateDto(
+                feedHoney.getId(),
+                feedHoney.getFeedId().getValue(),
+                feedHoney.getMemberCode().getValue(),
+                feedHoney.getCreateTime()
+        );
 
-        return responseFeedHoneyCreateDto;
+        return feedHoneyResponseCreateDto;
 
     }
 
-    /* 허니 취소 */
+    /** 허니 취소 */
     @Transactional
-    public ResponseFeedHoneyDeleteDto deleteFeedHoney(String accessToken, Long feedId) {
+    public FeedHoneyResponseDeleteDto deleteFeedHoney(String accessToken, Long feedId) {
 
         log.info("[FeedService] deleteFeedHoney Start =========================================================");
         log.info("[FeedService] feedId : " + feedId);
@@ -167,14 +261,14 @@ public class FeedService {
         feedHoney.setDeleteYn('Y');
         feedHoneyRepository.save(feedHoney);
 
-        ResponseFeedHoneyDeleteDto responseFeedHoneyDeleteDto = new ResponseFeedHoneyDeleteDto();
-        responseFeedHoneyDeleteDto.setFeedHoneyId(feedHoney.getId());
-        responseFeedHoneyDeleteDto.setFeedId(feedHoney.getFeedId().getValue());
-        responseFeedHoneyDeleteDto.setMemberCode(feedHoney.getMemberCode().getValue());
-        responseFeedHoneyDeleteDto.setDeleteTime(feedHoney.getDeleteTime());
+        FeedHoneyResponseDeleteDto feedHoneyResponseDeleteDto = new FeedHoneyResponseDeleteDto(
+                feedHoney.getId(),
+                feedHoney.getFeedId().getValue(),
+                feedHoney.getMemberCode().getValue(),
+                feedHoney.getDeleteTime()
+        );
 
-        return responseFeedHoneyDeleteDto;
+        return feedHoneyResponseDeleteDto;
 
     }
-
 }

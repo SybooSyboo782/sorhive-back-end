@@ -49,7 +49,9 @@
           left join tbl_follows b on a.member_code = b.following_id
          where b.follower_id = #{ memberCode }
            and a.member_delete_yn = 'N'
-         order by member_lifing_yn desc
+           and a.member_role = 'ROLE_MEMBER'
+           and b.follow_delete_yn = 'N'
+         order by a.member_lifing_yn desc
          limit 30 offset #{ offset }
     </select>
 
@@ -67,10 +69,12 @@
           left join tbl_follows b on a.member_code = b.following_id
          where b.follower_id = #{ memberCode }
            and a.member_delete_yn = 'N'
+           and a.member_role = 'ROLE_MEMBER'
+           and b.follow_delete_yn = 'N'
          limit 6
     </select>
 
-    <select id="findAllByMemberCode" resultMap="memberSummaryResultMap">
+    <select id="findOneByMemberCode" resultMap="memberSummaryResultMap">
         select
                a.member_code
              , a.member_id
@@ -86,6 +90,7 @@
           left join tbl_follows b on a.member_code = b.following_id
          where a.member_code = #{ memberCode }
            and a.member_delete_yn = 'N'
+           and a.member_role = 'ROLE_MEMBER'
     </select>
 
     <select id="findMaxMemberCode" resultType="int">
@@ -93,6 +98,7 @@
                max(member_code)
           from tbl_members
          where member_delete_yn = 'N'
+           and member_role = 'ROLE_MEMBER'
     </select>
 
     <select id="countFeed" resultType="int">
@@ -117,5 +123,29 @@
           from tbl_follows
          where follower_id = #{memberCode}
            and follow_delete_yn = 'N'
+    </select>
+
+    <select id="findFolloingSummary" resultMap="followResultMap">
+        select
+               follow_id
+             , following_id
+             , follower_id
+          from tbl_follows
+         where follower_id = #{ownMemberCode}
+           and following_id = #{memberCode}
+           and follow_delete_yn = 'N'
+         group by following_id
+    </select>
+
+    <select id="findFollowerSummary" resultMap="followResultMap">
+        select
+               follow_id
+             , following_id
+             , follower_id
+          from tbl_follows
+         where following_id = #{ownMemberCode}
+           and follower_id = #{memberCode}
+           and follow_delete_yn = 'N'
+         group by following_id
     </select>
 </mapper>

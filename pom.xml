@@ -83,21 +83,6 @@
             <version>0.11.2</version>
             <scope>runtime</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.4</version>
-        </dependency>
-
-
-        <!-- 로깅 처리를 위한 라이브러리로 log4j는 단종되어 j2로 추가하자. -->
-        <!-- https://mvnrepository.com/artifact/org.bgee.log4jdbc-log4j2/log4jdbc-log4j2-jdbc4.1 -->
-        <dependency>
-            <groupId>org.bgee.log4jdbc-log4j2</groupId>
-            <artifactId>log4jdbc-log4j2-jdbc4.1</artifactId>
-            <version>1.16</version>
-        </dependency>
-
 
         <!-- entity와 dto를 서로 바꾸기 위한 modelmapper 등록 -->
         <!-- https://mvnrepository.com/artifact/org.modelmapper/modelmapper -->

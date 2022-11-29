@@ -41,7 +41,6 @@ jobs: # job - 하나의 인스턴스에서 여러 Step을 그룹시켜 실행하
         cloud.aws.s3.bucket: ${{ secrets.AWS_S3_BUCKET }}
         url.avatar: ${{ secrets.AI_AVATAR }}
         url.lifing: ${{ secrets.AI_LIFING }}
-        url.friend: ${{ secrets.AI_FRIEND }}
 
     # Caching dependencies
     - name: Cache Maven packages

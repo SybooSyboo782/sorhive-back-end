@@ -1,6 +1,7 @@
 package com.sorhive.comprojectserver.room.command.domain.furnitureimage;
 
 import com.sorhive.comprojectserver.room.command.domain.room.Room;
+import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
@@ -23,6 +24,7 @@ import java.sql.Timestamp;
  */
 @Entity
 @Table(name = "tbl_furniture_images")
+@Getter
 public class FurnitureImage {
 
     @Id
@@ -66,6 +68,12 @@ public class FurnitureImage {
         this.imageNo = imageNo;
         this.uploadTime = new Timestamp(System.currentTimeMillis());
         this.room = room;
+        this.deleteYn = 'N';
 
+    }
+
+    public void delete() {
+        this.deleteTime = new Timestamp(System.currentTimeMillis());
+        this.deleteYn = 'Y';
     }
 }

@@ -20,6 +20,8 @@ import java.util.List;
  * ----------------------------------------------------------------
  * 2022-11-02       부시연           최초 생성
  * 2022-11-16       부시연           피드 총 수 계산
+ * 2022-11-19       부시연           피드 삭제
+ * 2022-11-20       부시연           피드 수정
  * </pre>
  *
  * @author 부시연(최초 작성자)
@@ -85,4 +87,19 @@ public class Feed {
         this.feedHoneyCount += feedHoneyCount;
     }
 
+    /** 피드 삭제 */
+    public void delete() {
+        
+        this.feedDeleteYn = 'Y';
+        this.feedDeleteTime = new Timestamp(System.currentTimeMillis());
+        
+    }
+    
+    /** 피드 수정 */
+    public void modify(String feedContent) {
+        
+        this.feedContent = feedContent;
+        this.feedUploadTime = new Timestamp(System.currentTimeMillis());
+        
+    }
 }

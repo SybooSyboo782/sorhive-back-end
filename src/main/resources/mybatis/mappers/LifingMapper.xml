@@ -15,7 +15,6 @@
         <result property="lifingConetent" column="lifing_content"/>
         <result property="lifingNo" column="lifing_no"/>
         <result property="lifingCategoryNo" column="lifing_category_no"/>
-        <result property="analyzedLifingNo" column="anaylzed_lifing_no"/>
         <result property="lifingWriterCode" column="lifing_writer_code"/>
         <result property="lifingWriterId" column="lifing_writer_id"/>
         <result property="lifingWriterName" column="lifing_writer_name"/>
@@ -47,10 +46,10 @@
         select
                lifing_image_id
              , lifing_image_path
-             , anaylzed_lifing_no
              , max(lifing_upload_time)
           from tbl_lifing_image
          where lifing_id = #{lifing_id}
+           and lifing_delete_yn = 'N'
     </select>
 
     <select id="findAllLifingByMemberCode" resultMap="lifingResultMap">
@@ -79,7 +78,7 @@
                count(lifing_id)
           from tbl_lifing_honey
          where lifing_id = ${lifingId}
-           and a.lifing_delete_yn = 'N'
+           and lifing_delete_yn = 'N'
     </select>
 
     <select id="selectAllLifingComments" resultMap="lifingCommentResultMap">
@@ -97,11 +96,33 @@
          order by lifing_comment_id desc
     </select>
 
-    <select id="selectAllLifingImages" resultMap="lifingPathResultMap">
+    <select id="selectLifingImage" resultMap="lifingPathResultMap">
         select
                lifing_image_id
              , lifing_image_path
           from tbl_lifing_image
          where lifing_id = #{ lifingId }
+           and lifing_delete_yn = 'N'
+    </select>
+
+    <select id="findOneByCreateTime" resultMap="lifingResultMap">
+        select
+               lifing_id
+             , lifing_upload_time
+             , lifing_category_no
+             , lifing_no
+             , lifing_writer_code
+             , lifing_writer_name
+             , lifing_writer_id
+             , lifing_content
+          from tbl_lifings
+         where (lifing_writer_code
+             , lifing_create_time) in(
+               select
+                      lifing_writer_code
+                    , max(lifing_create_time)
+                 from tbl_lifings
+         group by lifing_writer_code
+        having lifing_writer_code = #{writerCode})
     </select>
 </mapper>

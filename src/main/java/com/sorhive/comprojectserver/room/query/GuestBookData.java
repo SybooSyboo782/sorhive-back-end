@@ -1,5 +1,6 @@
 package com.sorhive.comprojectserver.room.query;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
@@ -17,6 +18,7 @@ import java.util.Date;
  * DATE             AUTHOR           NOTE
  * ----------------------------------------------------------------
  * 2022-11-13       부시연           최초 생성
+ * 2022-11-22       부시연           변수명 수정
  * </pre>
  *
  * @author 부시연(최초 작성자)
@@ -31,32 +33,33 @@ public class GuestBookData {
     @Id
     @Column(name="guestbook_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long guestBookId;
 
     @Column(name = "guestbook_content")
-    private String content;
+    private String guestBookContent;
 
     @Column(name = "guestbook_writer_code")
-    private Long memberCode;
+    private Long guestBookWriterCode;
 
     @Column(name = "guestbook_writer_name")
-    private String memberName;
+    private String guestBookWriterName;
 
     @Column(name = "guestbook_writer_id")
-    private String memberId;
+    private String guestBookWriterId;
 
+    @JsonIgnore
     @Column(name= "room_id")
     private Long roomId;
 
     @Column(name = "guestbook_create_time")
     @CreationTimestamp
-    private Date createTime;
+    private Date guestBookCreateTime;
 
     @Column(name = "guestbook_upload_time")
-    private Timestamp uploadTime;
+    private Timestamp guestBookUploadTime;
 
     @Column(name = "guestbook_delete_yn")
     @ColumnDefault("'N'")
-    private Character deleteYn;
+    private Character guestBookDeleteYn;
 
 }

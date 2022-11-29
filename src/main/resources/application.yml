@@ -9,7 +9,7 @@ server:
 
 spring:
   datasource:
-    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    driver-class-name: com.mysql.cj.jdbc.Driver
     url: RDBMS_URL
     username: comproject
     password: comproject
@@ -87,7 +87,6 @@ cloud:
 url:
   avatar: AI_AVATAR
   lifing: AI_LIFING
-  friend: AI_FRIEND
 
 mybatis:
   mapper-locations: mybatis/**/*.xml

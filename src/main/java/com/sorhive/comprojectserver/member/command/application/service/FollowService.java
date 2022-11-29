@@ -1,14 +1,15 @@
 package com.sorhive.comprojectserver.member.command.application.service;
 
 import com.sorhive.comprojectserver.config.jwt.TokenProvider;
-import com.sorhive.comprojectserver.member.command.application.exception.ExistFollowException;
-import com.sorhive.comprojectserver.member.command.application.exception.NoFollowException;
-import com.sorhive.comprojectserver.member.command.application.exception.NoMemberException;
-import com.sorhive.comprojectserver.member.command.application.exception.SameMemberException;
 import com.sorhive.comprojectserver.member.command.domain.model.follow.Follow;
 import com.sorhive.comprojectserver.member.command.domain.model.follow.FollowerId;
 import com.sorhive.comprojectserver.member.command.domain.model.follow.FollowingId;
+import com.sorhive.comprojectserver.member.command.domain.model.member.MemberRole;
 import com.sorhive.comprojectserver.member.command.domain.repository.FollowRepository;
+import com.sorhive.comprojectserver.member.command.exception.ExistFollowException;
+import com.sorhive.comprojectserver.member.command.exception.NoFollowException;
+import com.sorhive.comprojectserver.member.command.exception.NoMemberException;
+import com.sorhive.comprojectserver.member.command.exception.SameMemberException;
 import com.sorhive.comprojectserver.member.query.member.MemberDataDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,7 @@ public class FollowService {
             throw new SameMemberException("동일한 회원입니다.");
         }
 
-        if(memberDataDao.findByMemberCode(followingId) == null) {
+        if(memberDataDao.findByMemberCodeAndMemberRole(followingId, MemberRole.valueOf("ROLE_MEMBER")) == null) {
             throw new NoMemberException("해당 회원이 존재하지 않습니다.");
         }
 

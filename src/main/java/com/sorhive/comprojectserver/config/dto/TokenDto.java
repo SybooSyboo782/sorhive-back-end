@@ -19,16 +19,18 @@ public class TokenDto {
 
     private String memberName;
     private Long memberCode;
+    private Character avatarYn;
     private String accessToken;
     private Long accessTokenExpiresIn;
 
     public TokenDto() {
     }
 
-    public TokenDto(String grantType, String memberName, Long memberCode, String accessToken, Long accessTokenExpiresIn) {
+    public TokenDto(String grantType, String memberName, Long memberCode, Character avatarYn,String accessToken, Long accessTokenExpiresIn) {
         this.grantType = grantType;
         this.memberName = memberName;
         this.memberCode = memberCode;
+        this.avatarYn = avatarYn;
         this.accessToken = accessToken;
         this.accessTokenExpiresIn = accessTokenExpiresIn;
     }
@@ -68,6 +70,10 @@ public class TokenDto {
     public Long getMemberCode() { return memberCode; }
 
     public void setMemberCode(Long memberCode) { this.memberCode = memberCode; }
+
+    public Character getAvatarYn() { return avatarYn; }
+
+    public void setAvatarYn(Character avatarYn) { this.avatarYn = avatarYn; }
 
     @Override
     public String toString() {

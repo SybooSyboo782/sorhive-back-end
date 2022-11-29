@@ -1,5 +1,7 @@
 package com.sorhive.comprojectserver.member.query.member;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sorhive.comprojectserver.member.command.domain.model.member.MemberRole;
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -39,6 +41,12 @@ public class MemberData {
     @ColumnDefault("N")
     private Character deleteYn;
 
+    @Column(name = "member_role")
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'ROLE_MEMBER'")
+    @JsonIgnore
+    private MemberRole memberRole;
+
     @Column(name = "member_room_image")
     @ColumnDefault("''")
     private String memberRoomImage;
@@ -58,6 +66,10 @@ public class MemberData {
     @Column(name = "member_lifing_yn")
     @ColumnDefault("'N'")
     private Character lifingYn;
+
+    @Column(name = "member_avatar_yn")
+    @ColumnDefault("'N'")
+    private Character avatarYn;
 
     protected MemberData() {
     }

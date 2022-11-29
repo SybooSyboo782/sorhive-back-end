@@ -2,7 +2,6 @@ package com.sorhive.comprojectserver.lifing.command.application.dto;
 
 import com.sorhive.comprojectserver.lifing.command.domain.model.lifingcomment.LifingCommentWriter;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.sql.Timestamp;
 
@@ -22,7 +21,6 @@ import java.sql.Timestamp;
  * @see (참고할 class 또는 외부 url)
  */
 @Getter
-@Setter
 public class LifingCommentUpdateResponseDto {
 
     private Long lifingCommentId;
@@ -30,4 +28,10 @@ public class LifingCommentUpdateResponseDto {
     private LifingCommentWriter lifingCommentWriter;
     private Timestamp lifingCommentUploadTime;
 
+    public LifingCommentUpdateResponseDto(Long lifingCommentId, String lifingCommentContent, LifingCommentWriter lifingCommentWriter, Timestamp lifingCommentUploadTime) {
+        this.lifingCommentId = lifingCommentId;
+        this.lifingCommentContent = lifingCommentContent;
+        this.lifingCommentWriter = lifingCommentWriter;
+        this.lifingCommentUploadTime = lifingCommentUploadTime;
+    }
 }
