@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
  * 2022-11-16       부시연           라이핑 댓글 삭제
  * 2022-11-17       부시연           라이핑 삭제
  * 2022-11-17       부시연           라이핑 댓글 수정
+ * 2022-11-19       부시연           라이핑 이미지 전송 객체 일부 수정
  * </pre>
  *
  * @author 부시연(최초 작성자)
@@ -49,27 +50,27 @@ public class LifingController {
 
     /** 라이핑 이미지 생성 */
     @PostMapping("lifing/image")
-    public ResponseEntity<ResponseDto> lifingImage(@RequestHeader String Authorization, @RequestBody LifingImageDto lifingImageDto) {
+    public ResponseEntity<ResponseDto> lifingImage(@RequestHeader String Authorization, @RequestBody LifingImageRequestDto lifingImageRequestDto) {
 
         log.info("[LifingController] lifingImage Start ===================");
-        log.info("[LifingController] lifingImageDto : " + lifingImageDto);
+        log.info("[LifingController] lifingImageRequestDto : " + lifingImageRequestDto);
 
         String accessToken = Authorization.substring(7);
 
-        return ResponseEntity.ok().body(new ResponseDto(HttpStatus.CREATED, "라이핑 이미지 생성 성공", lifingInfraService.insertLifingImage(accessToken, lifingImageDto)));
+        return ResponseEntity.ok().body(new ResponseDto(HttpStatus.CREATED, "라이핑 이미지 생성 성공", lifingInfraService.insertLifingImage(accessToken, lifingImageRequestDto)));
 
     }
 
     /** 라이핑 AI 분석 이미지 생성 */
     @PostMapping("lifing/image/ai")
-    public ResponseEntity<ResponseDto> lifingAiImage(@RequestHeader String Authorization, @RequestBody LifingAIImageDto lifingAIImageDto) {
+    public ResponseEntity<ResponseDto> lifingAiImage(@RequestHeader String Authorization, @RequestBody LifingAIImageRequestDto lifingAIImageRequestDto) {
 
         log.info("[LifingController] lifingAiImage Start ===================");
-        log.info("[LifingController] lifingImageDto : " + lifingAIImageDto);
+        log.info("[LifingController] lifingImageDto : " + lifingAIImageRequestDto);
 
         String accessToken = Authorization.substring(7);
 
-        return ResponseEntity.ok().body(new ResponseDto(HttpStatus.CREATED, "라이핑 AI 이미지 생성 성공", lifingInfraService.insertLifingAiImage(accessToken, lifingAIImageDto)));
+        return ResponseEntity.ok().body(new ResponseDto(HttpStatus.CREATED, "라이핑 AI 이미지 생성 성공", lifingInfraService.insertLifingAiImage(accessToken, lifingAIImageRequestDto)));
 
     }
 

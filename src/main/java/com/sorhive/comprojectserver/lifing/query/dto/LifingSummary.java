@@ -11,12 +11,14 @@ import java.util.List;
 /**
  * <pre>
  * Class : LifingSummary
- * Comment: 클래스에 대한 간단 설명
+ * Comment: 라이핑 데이터 전송객체
  * History
  * ================================================================
  * DATE             AUTHOR           NOTE
  * ----------------------------------------------------------------
  * 2022-11-16       부시연           최초 생성
+ * 2022-11-22       부시연           분석된 라이핑 번호 제거
+ * 2022-11-23       부시연           회원 상세 조회 기능 변경으로 JsonIgnore 추가
  * </pre>
  *
  * @author 부시연(최초 작성자)
@@ -25,21 +27,6 @@ import java.util.List;
  */
 @Getter
 public class LifingSummary {
-/**
- * <pre>
- * Class : LifingData
- * Comment: 라이핑 데이터 전송객체
- * History
- * ================================================================
- * DATE             AUTHOR           NOTE
- * ----------------------------------------------------------------
- * 2022-11-12       부시연           최초 생성
- * </pre>
- *
- * @author 부시연(최초 작성자)
- * @version 1(클래스 버전)
- * @see (참고할 class 또는 외부 url)
- */
 
     private Long lifingId;
 
@@ -49,9 +36,6 @@ public class LifingSummary {
 
     private Long lifingCategoryNo;
 
-    @JsonIgnore
-    private Long analyzedLifingNo;
-
     private Long lifingWriterCode;
 
     private String lifingWriterId;
@@ -60,6 +44,7 @@ public class LifingSummary {
 
     private Timestamp uploadTime;
 
+    @JsonIgnore
     private Character deleteYn;
 
     @JsonIgnore
@@ -68,6 +53,7 @@ public class LifingSummary {
     @JsonIgnore
     private List<LifingCommentData> lifingCommentData = new ArrayList<>();
 
+    @JsonIgnore
     private List<LifingImagePath> lifingImages = new ArrayList<>();
 
     protected LifingSummary() {}

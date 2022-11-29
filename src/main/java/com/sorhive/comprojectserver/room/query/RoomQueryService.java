@@ -31,6 +31,8 @@ import java.util.Optional;
  * 2022-11-10       부시연           룸 상세 조회 추가
  * 2022-11-13       부시연           룸 조회수 기능 추가
  * 2022-11-13       부시연           방명록 조회 추가
+ * 2022-11-20       부시연           가구 이미지 조회 추가
+ * 2022-11-22       부시연           방명록 변수명 수정
  * </pre>
  *
  * @author 부시연(최초 작성자)
@@ -45,6 +47,7 @@ public class RoomQueryService {
     private RoomRepository roomRepository;
     private RoomVisitRepository roomVisitRepository;
     private MongoRoomRepository mongoRoomRepository;
+    private FurnitureImageDataDao furnitureImageDataDao;
     private GuestBookDataDao guestBookDataDao;
     private TokenProvider tokenProvider;
 
@@ -78,33 +81,42 @@ public class RoomQueryService {
             roomVisitRepository.save(roomVisit);
         }
 
-        /* 방 상세 조회 응답 객체 생성하기 */
-        RoomDetailResponseDto roomDetailResponseDto = new RoomDetailResponseDto();
+        /* 룸 데이터 조회하기 */
+        RoomData roomData = roomDataDao.findById(roomId);
+
+        String roomNo = roomData.getRoomNo();
+
+        /* 몽고 DB에 있는 해당 룸 데이터 조회하기 */
+        Optional<MongoRoom> mongoRooms = mongoRoomRepository.findById(roomNo);
+
+        /* 방 상세 조회 응답 객체 생성 및 정보 담기 */
+        RoomDetailResponseDto roomDetailResponseDto = new RoomDetailResponseDto(
+                roomData.getId(),
+                mongoRooms.get().getRoomCreator(),
+                mongoRooms.get().getFurnitures(),
+                mongoRooms.get().getId()
+        );
 
         /* 만약 방에 삭제가 안된 방명록이 있다면 */
-        if(guestBookDataDao.findByRoomIdAndDeleteYnEquals(roomId, 'N') != null) {
+        if(guestBookDataDao.findByRoomIdAndGuestBookDeleteYnEquals(roomId, 'N') != null) {
 
             /* 방명록 리스트 가져오기 */
-            List<GuestBookData> guestBookData =  guestBookDataDao.findByRoomIdAndDeleteYnEquals(roomId, 'N');
+            List<GuestBookData> guestBookData =  guestBookDataDao.findByRoomIdAndGuestBookDeleteYnEquals(roomId, 'N');
 
             /* 응답 객체에 방명록 리스트 담기 */
             roomDetailResponseDto.setGuestBookDataList(guestBookData);
 
         }
 
-        /* 룸 데이터 조회하기 */
-        RoomData roomData = roomDataDao.findById(roomId);
+        /* 만약 방에 삭제가 안 된 가구이미지가 있다면 */
+        if(furnitureImageDataDao.findByRoomIdAndDeleteYnEquals(roomId, 'N') != null) {
 
-        String roomNo = roomData.getRoomNo();
-        roomDetailResponseDto.setRoomId(roomData.getId());
+            /* 가구 이미지 리스트 가져오기 */
+            List<FurnitureImageData> furnitureImageData = furnitureImageDataDao.findByRoomIdAndDeleteYnEquals(roomId, 'N');
 
-        /* 몽고 DB에 있는 해당 룸 데이터 조회하기 */
-        Optional<MongoRoom> mongoRooms = mongoRoomRepository.findById(roomNo);
-
-        /* 응답 객체에 방 정보 담기 */
-        roomDetailResponseDto.setRoomCreator(mongoRooms.get().getRoomCreator());
-        roomDetailResponseDto.setFurnitures(mongoRooms.get().getFurnitures());
-        roomDetailResponseDto.setMongoRoomid(mongoRooms.get().getId());
+            /* 응답 객체에 가구 이미지 리스트 담기 */
+            roomDetailResponseDto.setFurnitureImageDataList(furnitureImageData);
+        }
 
         return roomDetailResponseDto;
 

@@ -24,4 +24,10 @@ public class FollowSummary {
     private Long followingId;
     private Long followerId;
     protected FollowSummary() {}
+
+    public FollowSummary(Long followId, Long followingId, Long followerId) {
+        this.followId = followId;
+        this.followerId = followerId;
+        this.followingId = followingId;
+    }
 }

@@ -6,7 +6,6 @@ import com.sorhive.comprojectserver.member.command.application.dto.AvatarImageDt
 import com.sorhive.comprojectserver.member.command.application.dto.ResponseAvatarImageAiDto;
 import com.sorhive.comprojectserver.member.command.domain.model.avatarimage.AvatarImage;
 import com.sorhive.comprojectserver.member.command.domain.repository.AvatarImageRepository;
-import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,16 +37,20 @@ import java.util.Optional;
  * @version 1(클래스 버전)
  */
 @Service
-@RequiredArgsConstructor
 public class AvatarImageInfraService {
 
     private static final Logger log = LoggerFactory.getLogger(AvatarImageInfraService.class);
     private final S3AvatarImageFile s3AvatarImageFile;
     private final AvatarImageRepository avatarImageRepository;
     private final TokenProvider tokenProvider;
-
     @Value("${url.avatar}")
-    private String url;
+    private String avatarUrl;
+
+    public AvatarImageInfraService(S3AvatarImageFile s3AvatarImageFile, AvatarImageRepository avatarImageRepository, TokenProvider tokenProvider) {
+        this.s3AvatarImageFile = s3AvatarImageFile;
+        this.avatarImageRepository = avatarImageRepository;
+        this.tokenProvider = tokenProvider;
+    }
 
     /** 아바타 이미지 생성 */
     @Transactional
@@ -56,6 +59,7 @@ public class AvatarImageInfraService {
         log.info("[AvatarImageInfraService] insertAvatarImage Start ===============");
         log.info("[AvatarImageInfraService] avatarImageDto : " + avatarImageDto);
 
+        final String url = avatarUrl;
         Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
 
         /* 중복되지 않게 아바타 이미지 이름 생성 */

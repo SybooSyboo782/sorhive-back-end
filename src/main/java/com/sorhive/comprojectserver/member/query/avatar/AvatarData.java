@@ -10,12 +10,13 @@ import javax.persistence.Table;
 /**
  * <pre>
  * Class : AvatarData
- * Comment: 클래스에 대한 간단 설명
+ * Comment: 아바타 조회용 엔티티
  * History
  * ================================================================
  * DATE             AUTHOR           NOTE
  * ----------------------------------------------------------------
  * 2022-11-14       부시연           최초 생성
+ * 2022-11-20       부시연           아바타 ID를 membercode로 변경
  * </pre>
  *
  * @author 부시연(최초 작성자)
@@ -29,7 +30,7 @@ public class AvatarData {
 
     @Id
     @Column(name="avatar_id")
-    private Long avatarId;
+    private Long memberCode;
 
     @Column(name = "avatar_face_type")
     private Integer faceType;

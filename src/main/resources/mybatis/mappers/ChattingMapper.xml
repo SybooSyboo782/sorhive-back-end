@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sorhive.comprojectserver.chatting.query.ChattingMapper">
+
+    <resultMap id="chattingDataResultMap" type="com.sorhive.comprojectserver.chatting.query.ChattingData">
+        <id property="chattingNo" column="chatting_no"/>
+        <result property="memberCode1" column="chatting_member_1"/>
+        <result property="memberCode2" column="chatting_member_2"/>
+        <result property="chattingId" column="chatting_id"/>
+        <result property="uploadTime" column="chatting_upload_time"/>
+    </resultMap>
+
+    <select id="findChattingList" resultMap="chattingDataResultMap">
+        select
+               chatting_member_1
+             , chatting_member_2
+             , chatting_upload_time
+          from tbl_chatting
+         where chatting_member_1 = ${memberCode}
+         group by chatting_member_2
+         union
+        select
+               chatting_member_1
+             , chatting_member_2
+             , chatting_upload_time
+          from tbl_chatting
+         where chatting_member_2 = ${memberCode}
+         group by chatting_member_1
+         order by chatting_upload_time desc
+    </select>
+
+</mapper>

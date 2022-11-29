@@ -12,6 +12,7 @@ import org.springframework.data.repository.Repository;
  * DATE             AUTHOR           NOTE
  * ----------------------------------------------------------------
  * 2022-11-17       부시연           최초 생성
+ * 2022-11-20       부시연           가구 이미지 번호로 가구이미지 찾기
  * </pre>
  *
  * @author 부시연(최초 작성자)
@@ -22,4 +23,6 @@ public interface FurnitureImageRepository extends Repository<FurnitureImage, Lon
 
     void save(FurnitureImage furnitureImage);
 
+    FurnitureImage findById(Long furnitureImageId);
+    
 }

@@ -2,7 +2,6 @@ package com.sorhive.comprojectserver.room.query;
 
 import com.sorhive.comprojectserver.room.command.domain.room.RoomCreator;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 import java.util.Map;
@@ -23,12 +22,29 @@ import java.util.Map;
  * @see (참고할 class 또는 외부 url)
  */
 @Getter
-@Setter
 public class RoomDetailResponseDto {
 
     private Long roomId;
     private String mongoRoomid;
     private RoomCreator roomCreator;
     private List<GuestBookData> guestBookDataList;
+    private List<FurnitureImageData> furnitureImageDataList;
     private List<Map<String,Object>> furnitures;
+
+    public RoomDetailResponseDto(Long roomId, RoomCreator roomCreator, List<Map<String, Object>> furnitures, String mongoRoomid) {
+
+        this.roomId = roomId;
+        this.mongoRoomid = mongoRoomid;
+        this.roomCreator = roomCreator;
+        this.furnitures = furnitures;
+        
+    }
+
+    public void setGuestBookDataList(List<GuestBookData> guestBookDataList) {
+        this.guestBookDataList = guestBookDataList;
+    }
+
+    public void setFurnitureImageDataList(List<FurnitureImageData> furnitureImageDataList) {
+        this.furnitureImageDataList = furnitureImageDataList;
+    }
 }

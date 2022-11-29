@@ -1,6 +1,6 @@
 package com.sorhive.comprojectserver.feed.query;
 
-import com.sorhive.comprojectserver.feed.command.application.exception.NoFeedException;
+import com.sorhive.comprojectserver.feed.exception.NoFeedException;
 import com.sorhive.comprojectserver.feed.query.dto.*;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -40,9 +40,13 @@ public class FeedQueryService {
         Long memberCode = feedRequestDto.getMemberCode();
         int pageNo = feedRequestDto.getPageNo() - 1;
 
+        if(pageNo < 0) {
+            pageNo = 0;
+        }
+
         /* 피드가 없으면 예외처리 */
-        if(feedMapper.selectAllFeed(memberCode, pageNo) == null) {
-            throw new NoFeedException();
+        if(feedMapper.selectAllFeed(memberCode, pageNo).isEmpty()) {
+            throw new NoFeedException("피드가 없습니다.");
         }
 
         /* 전체 피드 응답용 전송 객체 만들기 */
@@ -80,7 +84,9 @@ public class FeedQueryService {
 
         /* 피드에 이미지 있는지 확인 */
         if(feedMapper.selectAllFeedImages(feedId) != null) {
-            
+
+            log.info("[FeedQueryService] selectAllFeedImages Start ============" );
+
             List<FeedImageSummary> feedImageSummaryList = feedMapper.selectAllFeedImages(feedId);
 
             feedResponseDto.setFeedImageSummaryList(feedImageSummaryList);
@@ -89,9 +95,11 @@ public class FeedQueryService {
         /* 피드에 댓글 있는지 확인 */
         if(feedMapper.selectAllFeedComments(feedId) != null) {
 
+            log.info("[FeedQueryService] selectAllFeedComments Start ============" );
+
             List<FeedCommentSummary> feedCommentSummaries = feedMapper.selectAllFeedComments(feedId);
 
-            feedResponseDto.setFeedSummaryList(feedCommentSummaries);
+            feedResponseDto.setFeedCommentSummaryList(feedCommentSummaries);
         }
 
 

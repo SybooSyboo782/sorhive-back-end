@@ -16,6 +16,7 @@ import java.util.Optional;
  * ----------------------------------------------------------------
  * 2022-11-03       부시연           최초 생성
  * 2022-11-18       부시연           이메일 개수 세기 추가
+ * 2022-11-20       부시연           이메일과 이름으로 회원 찾기 추가
  * </pre>
  *
  * @author 부시연(최초 작성자)
@@ -30,5 +31,7 @@ public interface MemberRepository extends Repository<Member, Long> {
     Member findByMemberId(MemberId memberId);
 
     int countByMemberEmail(String email);
+
+    Member findByMemberEmailAndMemberNameAndDeleteYnEquals(String memberEmail, String memberName, char deleteYn);
     
 }

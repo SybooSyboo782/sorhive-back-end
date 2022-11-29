@@ -8,12 +8,15 @@ import com.sorhive.comprojectserver.member.command.domain.model.member.MemberCod
 import com.sorhive.comprojectserver.room.command.application.dto.GuestBookCreateRequestDto;
 import com.sorhive.comprojectserver.room.command.application.dto.GuestBookResponseDto;
 import com.sorhive.comprojectserver.room.command.application.dto.GuestBookUpdateRequestDto;
+import com.sorhive.comprojectserver.room.command.domain.furnitureimage.FurnitureImage;
 import com.sorhive.comprojectserver.room.command.domain.guestbook.GuestBook;
 import com.sorhive.comprojectserver.room.command.domain.guestbook.GuestBookWriter;
 import com.sorhive.comprojectserver.room.command.domain.guestbook.GuestBookWriterService;
+import com.sorhive.comprojectserver.room.command.domain.repository.FurnitureImageRepository;
 import com.sorhive.comprojectserver.room.command.domain.repository.GuestBookRepository;
 import com.sorhive.comprojectserver.room.command.domain.repository.RoomRepository;
 import com.sorhive.comprojectserver.room.command.domain.room.Room;
+import com.sorhive.comprojectserver.room.execption.NoFurnitureImageException;
 import com.sorhive.comprojectserver.room.execption.NoGuestBookException;
 import com.sorhive.comprojectserver.room.execption.NoRoomException;
 import org.slf4j.Logger;
@@ -34,6 +37,7 @@ import java.util.Optional;
  * 2022-11-13       부시연           방명록 생성 추가
  * 2022-11-16       부시연           방명록 수정 추가
  * 2022-11-16       부시연           방명록 삭제 추가
+ * 2022-11-20       부시연           가구 이미지 삭제 추가
  * </pre>
  *
  * @author 부시연(최초 작성자)
@@ -46,13 +50,15 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final GuestBookRepository guestBookRepository;
     private final GuestBookWriterService guestBookWriterService;
+    private final FurnitureImageRepository furnitureImageRepository;
     private final TokenProvider tokenProvider;
 
 
-    public RoomService(RoomRepository roomRepository, GuestBookRepository guestBookRepository, GuestBookWriterService guestBookWriterService, TokenProvider tokenProvider) {
+    public RoomService(RoomRepository roomRepository, GuestBookRepository guestBookRepository, GuestBookWriterService guestBookWriterService, FurnitureImageRepository furnitureImageRepository, TokenProvider tokenProvider) {
         this.roomRepository = roomRepository;
         this.guestBookRepository = guestBookRepository;
         this.guestBookWriterService = guestBookWriterService;
+        this.furnitureImageRepository = furnitureImageRepository;
         this.tokenProvider = tokenProvider;
     }
 
@@ -68,7 +74,7 @@ public class RoomService {
         GuestBookWriter guestBookWriter = guestBookWriterService.createGuestBookWriter(new MemberCode(memberCode));
 
         /* 요청 객체에서 값 꺼내오기 */
-        String guestBookContent = guestBookCreateRequestDto.getContent();
+        String guestBookContent = guestBookCreateRequestDto.getGuestBookContent();
         Long roomId = guestBookCreateRequestDto.getRoomId();
 
         /* 방번호에 맞는 방 찾기 */
@@ -158,6 +164,7 @@ public class RoomService {
         return guestBookResponseDto;
     }
 
+    /** 방명록 삭제 */
     public Object deleteGuestBook(String accessToken, Long guestBookId) {
 
         log.info("[RoomService] deleteGuestBook Start ===================================");
@@ -177,7 +184,9 @@ public class RoomService {
         Optional<GuestBook> guestBookData = guestBookRepository.findByIdAndDeleteYnEquals(guestBookId, 'N');
         GuestBook guestBook = guestBookData.get();
 
-        if(guestBook.getGuestBookWriter().getMemberCode().getValue() != memberCode) {
+        Long guestBookWriterCode = guestBook.getGuestBookWriter().getMemberCode().getValue();
+
+        if(!guestBookWriterCode.equals(memberCode)) {
             throw new NotSameWriterException("방명록 작성자와 요청자가 다릅니다");
         }
 
@@ -187,4 +196,33 @@ public class RoomService {
         return guestBook.getId();
 
     }
+
+    /** 가구 이미지 제거 */
+    public Object deleteFurnitureImage(String accessToken, Long furnitureImageId) {
+
+        log.info("[RoomService] deleteFurnitureImage Start ===================================");
+        log.info("[RoomService] furnitureImageId ", furnitureImageId);
+
+        Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
+
+        if(furnitureImageRepository.findById(furnitureImageId) == null) {
+            throw new NoFurnitureImageException("해당 가구 이미지는 존재하지 않습니다.");
+        }
+
+        FurnitureImage furnitureImage = furnitureImageRepository.findById(furnitureImageId);
+        if(furnitureImage.getDeleteYn() == 'Y') {
+            throw new AlreadyDeleteException("해당 가구 이미지는 이미 삭제되었습니다.");
+        }
+
+        if(furnitureImage.getRoom().getRoomCreator().getMemberCode().getValue() != memberCode) {
+            throw new NotSameWriterException("방 작성자와 요청자가 다릅니다.");
+        }
+
+        furnitureImage.delete();
+        furnitureImageRepository.save(furnitureImage);
+
+        return furnitureImage.getId();
+
+    }
+
 }

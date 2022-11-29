@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.Random;
 
 /**
  * <pre>
@@ -25,6 +24,7 @@ import java.util.Random;
  * 2022-11-10       부시연           아바타 이미지 추가
  * 2022-11-12       부시연           라이핑 번호 추가
  * 2022-11-15       부시연           라이핑 번호 로직 수정
+ * 2022-11-20       부시연           비밀번호 재설정 추가
  * </pre>
  *
  * @author 부시연(최초 작성자)
@@ -78,6 +78,10 @@ public class Member implements UserDetails {
     @Column(name = "member_avatar_image")
     @ColumnDefault("''")
     private String avatarImagePath;
+
+    @Column(name = "member_avatar_yn")
+    @ColumnDefault("'N'")
+    private Character avatarYn;
 
     @Column(name = "member_lifing_no")
     @ColumnDefault("-1")
@@ -157,9 +161,18 @@ public class Member implements UserDetails {
 
     public Character getLifingYn() { return lifingYn; }
 
+    public Character getAvatarYn() { return avatarYn; }
+
     public void setRoomImagePath(String roomImagePath) {
         this.roomImagePath = roomImagePath;
         this.uploadTime = new Timestamp(System.currentTimeMillis());
+    }
+
+    public void createAvatarImagePath(String avatarImagePath) {
+        this.avatarImagePath = avatarImagePath;
+        this.roomImagePath = "https://combucket.s3.ap-northeast-2.amazonaws.com/rooms/default_room.png";
+        this.uploadTime = new Timestamp(System.currentTimeMillis());
+        this.avatarYn = 'Y';
     }
 
     public void setAvatarImagePath(String avatarImagePath) {
@@ -179,7 +192,7 @@ public class Member implements UserDetails {
     public void changeLifingWithoutAI() {
         this.lifingNo = -1L;
         this.lifingCategoryNo = -1L;
-        this.lifingYn = 'N';
+        this.lifingYn = 'Y';
         this.uploadTime = new Timestamp(System.currentTimeMillis());
     }
 
@@ -223,9 +236,12 @@ public class Member implements UserDetails {
         return true;
     }
 
-    private String generateRandomPassword() {
-        Random random = new Random();
-        int number = random.nextInt();
-        return Integer.toHexString(number);
+    public void changePassword(String tempPassword) {
+        this.password = tempPassword;
+        this.uploadTime = new Timestamp(System.currentTimeMillis());
+    }
+
+    public void updateMember(String name) {
+        this.memberName = name;
     }
 }

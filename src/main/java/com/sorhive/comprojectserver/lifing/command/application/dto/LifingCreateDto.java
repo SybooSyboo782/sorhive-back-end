@@ -20,6 +20,7 @@ import lombok.Getter;
 @Getter
 public class LifingCreateDto {
 
+    private Long lifingId;
     private Long lifingNo;
     private Long lifingCategoryNo;
     private String lifingContent;

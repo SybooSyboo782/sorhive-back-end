@@ -16,5 +16,5 @@ package com.sorhive.comprojectserver.member.command.domain.model.member;
  */
 public enum MemberRole {
 
-    ROLE_ADMIN, ROLE_MEMBER
+    ROLE_ADMIN, ROLE_MEMBER, ROLE_AI
 }

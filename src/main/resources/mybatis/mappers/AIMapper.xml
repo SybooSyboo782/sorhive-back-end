@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sorhive.comprojectserver.ai.query.AIMapper">
+
+    <resultMap id="AiLearningLifingDataResultMap" type="com.sorhive.comprojectserver.ai.query.AILearningLifingResponseDto">
+        <id property="lifingImageId" column="lifing_image_id"/>
+        <result property="lifingImagePath" column="lifing_image_path"/>
+        <result property="analyzedLifingNo1" column="anaylzed_lifing_no1"/>
+        <result property="analyzedLifingScore1" column="anaylzed_lifing_score1"/>
+        <result property="analyzedLifingNo2" column="anaylzed_lifing_no2"/>
+        <result property="analyzedLifingScore2" column="anaylzed_lifing_score2"/>
+        <result property="analyzedLifingNo3" column="anaylzed_lifing_no3"/>
+        <result property="analyzedLifingScore3" column="anaylzed_lifing_score3"/>
+        <association property="aiLifingData" resultMap="LifingResultMap"/>
+    </resultMap>
+
+    <resultMap id="LifingResultMap" type="com.sorhive.comprojectserver.ai.query.AILifingData">
+        <id property="lifingId" column="lifing_id"/>
+        <result property="lifingCategoryNo" column="lifing_category_no"/>
+    </resultMap>
+
+    <select id="getAiLearningData" resultMap="AiLearningLifingDataResultMap">
+        select
+               a.lifing_image_id
+             , a.lifing_image_path
+             , a.anaylzed_lifing_no1
+             , a.anaylzed_lifing_score1
+             , a.anaylzed_lifing_no2
+             , a.anaylzed_lifing_score2
+             , a.anaylzed_lifing_no3
+             , a.anaylzed_lifing_score3
+             , b.lifing_category_no
+          from tbl_lifing_image a
+          join tbl_lifings b on a.lifing_id = b.lifing_id
+         where a.lifing_learning_yn = 'N'
+           and a.lifing_delete_yn = 'N'
+           and not b.lifing_category_no = '-1';
+    </select>
+
+</mapper>

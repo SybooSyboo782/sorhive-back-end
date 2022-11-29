@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * 2022-11-12       부시연           최초 생성
  * 2022-11-12       부시연           회원 번호로 회원의 모든 라이핑 조회
  * 2022-11-12       부시연           라이핑 번호로 상세 조회
+ * 2022-11-23       부시연           회원 상세 조회 기능 변경
  * </pre>
  *
  * @author 부시연(최초 작성자)
@@ -45,15 +46,15 @@ public class LifingQueryController {
     }
 
     /** 라이핑 상세 조회 */
-    @GetMapping("lifing/{lifingId}")
-    public ResponseEntity<ResponseDto> findLifingByLifingId(@RequestHeader String Authorization, @PathVariable Long lifingId) {
+    @GetMapping("lifing/{writerCode}")
+    public ResponseEntity<ResponseDto> findLifingByLifingId(@RequestHeader String Authorization, @PathVariable Long writerCode) {
 
         log.info("[QueryLifingController] findLifingByLifingId Start ==========");
-        log.info("[QueryLifingController] lifingId : " + lifingId);
+        log.info("[QueryLifingController] writerCode : " + writerCode);
 
         String accessToken = Authorization.substring(7);
 
-        return ResponseEntity.ok().body(new ResponseDto(HttpStatus.OK, "라이핑 상세 조회 성공", lifingQueryService.findLifingByLifingId(accessToken, lifingId)));
+        return ResponseEntity.ok().body(new ResponseDto(HttpStatus.OK, "라이핑 상세 조회 성공", lifingQueryService.findLifingByLifingId(accessToken, writerCode)));
     }
 
 }

@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * <pre>
@@ -28,6 +27,6 @@ public class ChattingCreateRequestDto {
 
     private final Long memberCode1;
     private final Long memberCode2;
-    private final List<Map<String,Object>> messages;
+    private final List<String> messages;
 
 }

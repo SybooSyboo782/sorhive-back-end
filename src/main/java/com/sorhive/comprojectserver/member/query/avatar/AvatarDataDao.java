@@ -5,7 +5,7 @@ import org.springframework.data.repository.Repository;
 /**
  * <pre>
  * Class : AvatarDataDao
- * Comment: 클래스에 대한 간단 설명
+ * Comment: 아바타 조회용 DAO
  * History
  * ================================================================
  * DATE             AUTHOR           NOTE
@@ -19,5 +19,5 @@ import org.springframework.data.repository.Repository;
  */
 public interface AvatarDataDao extends Repository<AvatarData, Long> {
 
-    AvatarData findByAvatarId(Long memberCode);
+    AvatarData findByMemberCode(Long memberCode);
 }

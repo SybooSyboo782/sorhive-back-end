@@ -1,6 +1,7 @@
 package com.sorhive.comprojectserver.member.query.member;
 
 import com.sorhive.comprojectserver.common.ResponseDto;
+import com.sorhive.comprojectserver.member.query.recommend.RecommendInfraQueryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -35,9 +36,11 @@ public class MemberQueryController {
 
     private static final Logger log = LoggerFactory.getLogger(MemberQueryController.class);
     private final MemberQueryService memberQueryService;
+    private final RecommendInfraQueryService recommendInfraQueryService;
 
-    public MemberQueryController(MemberQueryService memberQueryService) {
+    public MemberQueryController(MemberQueryService memberQueryService, RecommendInfraQueryService recommendInfraQueryService) {
         this.memberQueryService = memberQueryService;
+        this.recommendInfraQueryService = recommendInfraQueryService;
     }
 
     /** 회원 아이디 검색 */
@@ -72,7 +75,7 @@ public class MemberQueryController {
 
         String accessToken = Authorization.substring(7);
 
-        return ResponseEntity.ok().body(new ResponseDto(HttpStatus.OK, "회원 목록 조회 성공", memberQueryService.findAllByMemberCode(accessToken, page)));
+        return ResponseEntity.ok().body(new ResponseDto(HttpStatus.OK, "회원 목록 조회 성공", recommendInfraQueryService.findAllByMemberCode(accessToken, page)));
     }
     
     /** 룸인 할 때 회원 조회 */
@@ -111,10 +114,13 @@ public class MemberQueryController {
 
     /** 회원 상세 조회 */
     @GetMapping("member/{memberCode}")
-    public ResponseEntity<ResponseDto> selectMemberByMemberCode(@PathVariable Long memberCode) {
+    public ResponseEntity<ResponseDto> selectMemberByMemberCode(@RequestHeader String Authorization, @PathVariable Long memberCode) {
 
         log.info("[MemberQueryController] selectMemberByMemberCode Start =================");
 
-        return ResponseEntity.ok().body(new ResponseDto(HttpStatus.OK, "회원 상세 조회 성공", memberQueryService.selectMemberByMemberCode(memberCode)));
+        String accessToken = Authorization.substring(7);
+
+        return ResponseEntity.ok().body(new ResponseDto(HttpStatus.OK, "회원 상세 조회 성공", memberQueryService.selectMemberByMemberCode(accessToken, memberCode)));
     }
+
 }

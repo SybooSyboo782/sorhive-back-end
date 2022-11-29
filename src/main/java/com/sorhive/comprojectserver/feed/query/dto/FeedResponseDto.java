@@ -25,7 +25,7 @@ import java.util.List;
 public class FeedResponseDto {
 
     private FeedSummary feedSummary;
-    private List<FeedCommentSummary> feedSummaryList;
+    private List<FeedCommentSummary> feedCommentSummaryList;
     private List<FeedImageSummary> feedImageSummaryList;
 
 }

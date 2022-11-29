@@ -29,7 +29,6 @@
         </rollingPolicy>
     </appender>
 
-
     <!-- log4jdbc 옵션 설정-->
     <root level="INFO">
         <appender-ref ref="STDOUT"/>

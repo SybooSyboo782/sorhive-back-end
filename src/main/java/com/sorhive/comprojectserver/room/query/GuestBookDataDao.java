@@ -13,6 +13,7 @@ import java.util.List;
  * DATE             AUTHOR           NOTE
  * ----------------------------------------------------------------
  * 2022-11-13       부시연           최초 생성
+ * 2022-11-22       부시연           변수명 수정
  * </pre>
  *
  * @author 부시연(최초 작성자)
@@ -20,8 +21,5 @@ import java.util.List;
  * @see (참고할 class 또는 외부 url)
  */
 public interface GuestBookDataDao extends Repository<GuestBookData, Long> {
-
-    List<GuestBookData> findByMemberCodeAndRoomIdAndDeleteYnEquals(Long memberCode, Long roomId, char n);
-
-    List<GuestBookData> findByRoomIdAndDeleteYnEquals(Long roomId, char n);
+    List<GuestBookData> findByRoomIdAndGuestBookDeleteYnEquals(Long roomId, char n);
 }

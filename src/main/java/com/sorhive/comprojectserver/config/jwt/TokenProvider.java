@@ -82,7 +82,7 @@ public class TokenProvider {
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
 
-        return new TokenDto(BEARER_TYPE, member.getMemberName(), member.getMemberCode(), accessToken, accessTokenExpiresIn.getTime());
+        return new TokenDto(BEARER_TYPE, member.getMemberName(), member.getMemberCode(), member.getAvatarYn(), accessToken, accessTokenExpiresIn.getTime());
     }
     
     /* 유저 아이디(멤버코드) 가져오기 */

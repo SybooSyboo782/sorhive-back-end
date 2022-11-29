@@ -24,13 +24,14 @@ import javax.validation.Valid;
  * DATE             AUTHOR           NOTE
  * ----------------------------------------------------------------
  * 2022-11-03       부시연           최초 생성
- * 2022-11-09       부시연           방 생성 추가
- * 2022-11-10       부시연           접속용 방이미지 생성 추가
- * 2022-11-13       부시연           방명록 생성 추가
+ * 2022-11-09       부시연           방 생성 기능 추가
+ * 2022-11-10       부시연           접속용 방이미지 생성 기능 추가
+ * 2022-11-13       부시연           방명록 생성 기능 추가
  * 2022-11-13       부시연           서비스, 인프라 서비스 분리
- * 2022-11-16       부시연           방명록 수정 추가
- * 2022-11-16       부시연           방명록 삭제 추가
- * 2022-11-17       부시연           가구 이미지 생성 추가
+ * 2022-11-16       부시연           방명록 수정 기능 추가
+ * 2022-11-16       부시연           방명록 삭제 기능 추가
+ * 2022-11-17       부시연           가구 이미지 생성 기능 추가
+ * 2022-11-17       부시연           가구 이미지 삭제 기능 추가
  * </pre>
  *
  * @author 부시연(최초 작성자)
@@ -70,7 +71,19 @@ public class RoomController {
 
         String accessToken = Authorization.substring(7);
 
-        return ResponseEntity.ok().body(new ResponseDto(HttpStatus.CREATED, "방 생성 성공", roomInfraService.createFurnitureImage(accessToken, furnitureImageCreateRequestDto)));
+        return ResponseEntity.ok().body(new ResponseDto(HttpStatus.CREATED, "가구 이미지 생성 성공", roomInfraService.createFurnitureImage(accessToken, furnitureImageCreateRequestDto)));
+    }
+
+    /** 가구 이미지 제거 */
+    @DeleteMapping(value = "room/image/{furnitureImageId}")
+    public ResponseEntity<ResponseDto> deleteFurnitureImage(@RequestHeader String Authorization, @PathVariable Long furnitureImageId) {
+
+        log.info("[RoomController] deleteFurnitureImage Start ===================");
+        log.info("[RoomController] furnitureImageId : " + furnitureImageId);
+
+        String accessToken = Authorization.substring(7);
+
+        return ResponseEntity.ok().body(new ResponseDto(HttpStatus.NO_CONTENT, "가구 이미지 제거 성공", roomService.deleteFurnitureImage(accessToken, furnitureImageId)));
     }
 
     /** 방명록 생성 */

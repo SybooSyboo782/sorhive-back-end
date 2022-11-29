@@ -3,6 +3,8 @@ package com.sorhive.comprojectserver.member.query.member;
 import com.sorhive.comprojectserver.member.query.follow.FollowSummary;
 import lombok.Getter;
 
+import java.util.List;
+
 /**
  * <pre>
  * Class : MemberSummary
@@ -30,7 +32,7 @@ public class MemberSummary {
     private Long lifingNo;
     private Long lifingCategoryNo;
     private Character lifingYn;
-    private FollowSummary followSummary;
+    private List<FollowSummary> followSummary;
 
     protected MemberSummary() {}
 }
