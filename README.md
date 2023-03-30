@@ -134,6 +134,3 @@
 
 # Author
 - 부시연 - [Github](https://github.com/SybooSyboo782)
-
-
-# SorHive 프로젝트 구현사항
