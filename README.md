@@ -1,30 +1,6 @@
-# SorHive 프로젝트
+# SorHive Backend
 
-# 융합 구조도
-![융합구조도](https://user-images.githubusercontent.com/111809392/205318829-a7071a0d-5c43-4265-b92b-1fedc3d0e5b2.png)
-- 라이핑 배치서버는 생략했습니다.
-
-# Contents
-- [Development-Record](https://github.com/MA-Dot-COM/MA-Dot-COM-Back-End/wiki/Development-Record)
-- [참고자료](https://github.com/MA-Dot-COM/MA-Dot-COM-Back-End/wiki/%EC%B0%B8%EA%B3%A0-%EC%9E%90%EB%A3%8C)
-
-# Built With
-- [AWS RDS - MySQL](https://aws.amazon.com/ko/rds/mysql/?nc=sn&loc=1)
-- [MongoDB - Atlas](https://www.mongodb.com/ko-kr/cloud/atlas/efficiency)
-- [AWS Ec2](https://aws.amazon.com/ko/ec2/)
-- [AWS S3](https://aws.amazon.com/ko/s3/?nc=sn&loc=0)
-- [AWS ElasticBeanstalk](https://aws.amazon.com/ko/elasticbeanstalk/)
-- [SpringBoot](https://spring.io/projects/spring-boot)
-- [JPA](https://spring.io/projects/spring-data-jpa)
-- [Spring Security](https://spring.io/projects/spring-security)
-- [Spring Batch](https://spring.io/projects/spring-batch)
-- [MyBatis](https://mybatis.org/mybatis-3/)
-
-# Issue 관리
-- [진행중인 이슈](https://github.com/MA-Dot-COM/MA-Dot-COM-Back-End/issues)
-- [완료된 이슈](https://github.com/MA-Dot-COM/MA-Dot-COM-Back-End/issues?q=is%3Aissue+is%3Aclosed)
-
-# 바로 해결하기 힘들었던 이슈들
+# 회고
 1. [방 생성](https://github.com/MA-Dot-COM/MA-Dot-COM-Back-End/issues/13)
     <details>
     <summary>회고</summary>
@@ -128,6 +104,25 @@
     - 전송객체들의 Setter 제거를 통해 해결
     
     </details>
+
+# Contents
+- [참고자료](https://github.com/MA-Dot-COM/MA-Dot-COM-Back-End/wiki/%EC%B0%B8%EA%B3%A0-%EC%9E%90%EB%A3%8C)
+
+# Built With
+- [AWS RDS - MySQL](https://aws.amazon.com/ko/rds/mysql/?nc=sn&loc=1)
+- [MongoDB - Atlas](https://www.mongodb.com/ko-kr/cloud/atlas/efficiency)
+- [AWS Ec2](https://aws.amazon.com/ko/ec2/)
+- [AWS S3](https://aws.amazon.com/ko/s3/?nc=sn&loc=0)
+- [AWS ElasticBeanstalk](https://aws.amazon.com/ko/elasticbeanstalk/)
+- [SpringBoot](https://spring.io/projects/spring-boot)
+- [JPA](https://spring.io/projects/spring-data-jpa)
+- [Spring Security](https://spring.io/projects/spring-security)
+- [Spring Batch](https://spring.io/projects/spring-batch)
+- [MyBatis](https://mybatis.org/mybatis-3/)
+
+# Issue 관리
+- [진행중인 이슈](https://github.com/MA-Dot-COM/MA-Dot-COM-Back-End/issues)
+- [완료된 이슈](https://github.com/MA-Dot-COM/MA-Dot-COM-Back-End/issues?q=is%3Aissue+is%3Aclosed)
     
 # Continuous Integration Builds
 깃허브 액션을 통해 프로젝트를 진행하면서 지속적인 CI를 진행했습니다.
