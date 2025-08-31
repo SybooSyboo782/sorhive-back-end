@@ -2,10 +2,10 @@ package com.sorhive.comprojectserver.member.command.domain.model.avatar;
 
 import com.sorhive.comprojectserver.member.command.domain.model.member.MemberCode;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import java.util.Objects;
 
 /**

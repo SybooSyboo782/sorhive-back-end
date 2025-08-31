@@ -4,7 +4,7 @@ import com.sorhive.comprojectserver.member.command.domain.model.member.MemberCod
 import com.sorhive.comprojectserver.room.command.domain.room.Room;
 import com.sorhive.comprojectserver.room.command.domain.room.RoomId;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Timestamp;
 
 /**

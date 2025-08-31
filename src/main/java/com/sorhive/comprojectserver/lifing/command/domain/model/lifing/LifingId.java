@@ -1,7 +1,7 @@
 package com.sorhive.comprojectserver.lifing.command.domain.model.lifing;
 
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 

@@ -1,7 +1,7 @@
 package com.sorhive.comprojectserver.member.command.domain.model.member;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 

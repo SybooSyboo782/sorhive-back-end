@@ -3,7 +3,7 @@ package com.sorhive.comprojectserver.room.command.domain.room;
 import lombok.Getter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Id;
+import jakarta.persistence.Id;
 import java.util.List;
 import java.util.Map;
 

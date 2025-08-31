@@ -5,7 +5,7 @@ import com.sorhive.comprojectserver.lifing.command.domain.model.lifingimage.Lifi
 import com.sorhive.comprojectserver.lifing.command.domain.model.lifingvisit.LifingVisit;
 import lombok.Getter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;

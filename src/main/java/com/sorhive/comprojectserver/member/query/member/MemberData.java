@@ -5,7 +5,7 @@ import com.sorhive.comprojectserver.member.command.domain.model.member.MemberRol
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /**
  * <pre>

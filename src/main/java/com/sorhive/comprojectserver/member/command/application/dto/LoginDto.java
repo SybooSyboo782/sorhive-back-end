@@ -4,7 +4,7 @@ import com.sorhive.comprojectserver.member.command.domain.model.member.MemberId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * <pre>

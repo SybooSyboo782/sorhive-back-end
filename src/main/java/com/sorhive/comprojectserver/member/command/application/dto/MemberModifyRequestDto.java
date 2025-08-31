@@ -2,7 +2,7 @@ package com.sorhive.comprojectserver.member.command.application.dto;
 
 import lombok.Getter;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * <pre>

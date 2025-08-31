@@ -5,7 +5,7 @@ import com.sorhive.comprojectserver.feed.command.domain.model.feedimage.FeedImag
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;

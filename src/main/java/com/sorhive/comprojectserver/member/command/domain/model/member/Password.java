@@ -1,8 +1,8 @@
 package com.sorhive.comprojectserver.member.command.domain.model.member;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.validation.constraints.NotBlank;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * <pre>
