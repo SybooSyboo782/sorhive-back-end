@@ -1,6 +1,6 @@
 package com.sorhive.comprojectserver.member.command.domain.model.member;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 

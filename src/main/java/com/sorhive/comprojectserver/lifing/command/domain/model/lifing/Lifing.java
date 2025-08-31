@@ -6,7 +6,7 @@ import com.sorhive.comprojectserver.lifing.command.domain.model.lifingvisit.Lifi
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;

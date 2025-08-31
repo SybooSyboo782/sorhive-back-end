@@ -1,12 +1,16 @@
 package com.sorhive.comprojectserver.lifing.command.domain.model.lifingimage;
 
 import com.sorhive.comprojectserver.lifing.command.domain.model.lifing.Lifing;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Timestamp;
 
 /**

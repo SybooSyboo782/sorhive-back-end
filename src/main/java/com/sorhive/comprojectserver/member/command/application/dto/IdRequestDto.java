@@ -2,8 +2,8 @@ package com.sorhive.comprojectserver.member.command.application.dto;
 
 import lombok.Getter;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 
 /**
  * <pre>

@@ -2,7 +2,7 @@ package com.sorhive.comprojectserver.member.command.domain.model.follow;
 
 import org.hibernate.annotations.ColumnDefault;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Timestamp;
 
 /**

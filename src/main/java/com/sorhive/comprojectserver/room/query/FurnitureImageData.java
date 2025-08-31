@@ -3,7 +3,7 @@ package com.sorhive.comprojectserver.room.query;
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /**
  * <pre>

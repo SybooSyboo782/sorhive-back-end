@@ -6,7 +6,7 @@ import com.sorhive.comprojectserver.member.command.domain.model.member.MemberCod
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Timestamp;
 
 /**

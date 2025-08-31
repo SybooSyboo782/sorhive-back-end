@@ -4,7 +4,7 @@ import com.sorhive.comprojectserver.lifing.command.domain.model.lifing.Lifing;
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Timestamp;
 
 /**

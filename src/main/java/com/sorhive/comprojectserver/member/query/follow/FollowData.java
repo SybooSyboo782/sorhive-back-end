@@ -3,7 +3,7 @@ package com.sorhive.comprojectserver.member.query.follow;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /**
  * <pre>
