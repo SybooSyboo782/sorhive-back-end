@@ -1,9 +1,9 @@
 package com.sorhive.comprojectserver.chatting.command.domain.model;
 
+import jakarta.persistence.Id;
 import lombok.Getter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -43,7 +43,7 @@ public class MongoChatting {
     protected MongoChatting() {}
 
     public MongoChatting(Long memberCode1, String memberName1, String memberRoomImage1, Long memberCode2, String memberName2, String memberRoomImage2,List<String> messages) {
-        if(counter == null) {
+        if (counter == null) {
             counter = 0L;
         }
         this.counter += 1;

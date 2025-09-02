@@ -8,6 +8,8 @@ import com.sorhive.comprojectserver.member.command.domain.repository.MemberRepos
 import com.sorhive.comprojectserver.member.command.exception.AlreadyExistEmailException;
 import com.sorhive.comprojectserver.member.command.exception.NoEmailException;
 import com.sorhive.comprojectserver.member.command.exception.NoMemberException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,9 +17,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
-
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.util.Random;
@@ -69,7 +68,7 @@ public class AuthInfraService {
 
         int countEmail = memberRepository.countByMemberEmail(emailRequestDto.getEmail());
 
-        if(countEmail > 0) {
+        if (countEmail > 0) {
             log.warn("[AuthInfraService] AlreadyExistEmailException ");
             throw new AlreadyExistEmailException("해당 이메일은 이미 존재합니다.");
         }
@@ -93,19 +92,19 @@ public class AuthInfraService {
 
         int countEmail = memberRepository.countByMemberEmail(findIdRequestDto.getEmail());
 
-        if(countEmail == 0) {
+        if (countEmail == 0) {
             log.warn("[AuthInfraService] NoEmailException ");
             throw new NoEmailException("해당 이메일은 존재 하지 않습니다.");
         }
 
-        if(memberRepository.findByMemberEmailAndMemberNameAndDeleteYnEquals(email, name, 'N') == null) {
+        if (memberRepository.findByMemberEmailAndMemberNameAndDeletedEquals(email, name, false) == null) {
             log.warn("[AuthInfraService] NoEmailException ");
             throw new NoMemberException("해당 회원은 존재하지 않습니다.");
         }
 
-        Member member = memberRepository.findByMemberEmailAndMemberNameAndDeleteYnEquals(email, name, 'N');
+        Member member = memberRepository.findByMemberEmailAndMemberNameAndDeletedEquals(email, name, false);
 
-        return emailSend(email,"SORHIVE 아이디 찾기", "findid", member.getMemberId().getId());
+        return emailSend(email,"SORHIVE 아이디 찾기", "findid", member.getMemberId());
 
     }
 
@@ -120,17 +119,17 @@ public class AuthInfraService {
 
         int countEmail = memberRepository.countByMemberEmail(resetPasswordRequestDto.getEmail());
 
-        if(countEmail == 0) {
+        if (countEmail == 0) {
             log.warn("[AuthInfraService] NoEmailException ");
             throw new NoEmailException("해당 이메일은 존재 하지 않습니다.");
         }
 
-        if(memberRepository.findByMemberEmailAndMemberNameAndDeleteYnEquals(email, name, 'N') == null) {
+        if (memberRepository.findByMemberEmailAndMemberNameAndDeletedEquals(email, name, false) == null) {
             log.warn("[AuthInfraService] NoEmailException ");
             throw new NoMemberException("해당 회원은 존재하지 않습니다.");
         }
 
-        Member member = memberRepository.findByMemberEmailAndMemberNameAndDeleteYnEquals(email, name, 'N');
+        Member member = memberRepository.findByMemberEmailAndMemberNameAndDeletedEquals(email, name, false);
 
         String code = certCode();
 

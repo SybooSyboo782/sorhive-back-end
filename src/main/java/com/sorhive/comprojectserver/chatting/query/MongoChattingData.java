@@ -1,9 +1,9 @@
 package com.sorhive.comprojectserver.chatting.query;
 
+import jakarta.persistence.Id;
 import lombok.Getter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.List;
 

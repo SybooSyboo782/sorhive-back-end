@@ -3,6 +3,7 @@ package com.sorhive.comprojectserver.feed.command.application.dto;
 import lombok.Getter;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * <pre>
@@ -26,11 +27,11 @@ public class FeedCommentCreateResponseDto {
     private String feedCommentcontent;
     private Timestamp feedCommentCreateTime;
 
-    public FeedCommentCreateResponseDto(Long id, String content, Timestamp createTime) {
+    public FeedCommentCreateResponseDto(Long id, String content, LocalDateTime createTime) {
 
         this.feedCommentId = id;
         this.feedCommentcontent = content;
-        this.feedCommentCreateTime = createTime;
+        this.feedCommentCreateTime = Timestamp.valueOf(createTime);
 
     }
 }

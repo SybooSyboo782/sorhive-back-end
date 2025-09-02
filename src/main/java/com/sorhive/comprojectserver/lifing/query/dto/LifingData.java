@@ -1,11 +1,11 @@
 package com.sorhive.comprojectserver.lifing.query.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifingimage.LifingImage;
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifingvisit.LifingVisit;
+import com.sorhive.comprojectserver.lifing.command.domain.model.LifingImage;
+import com.sorhive.comprojectserver.lifing.command.domain.model.LifingVisit;
+import jakarta.persistence.*;
 import lombok.Getter;
 
-import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;

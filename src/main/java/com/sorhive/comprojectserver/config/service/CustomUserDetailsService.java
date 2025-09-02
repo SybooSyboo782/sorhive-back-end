@@ -1,7 +1,6 @@
 package com.sorhive.comprojectserver.config.service;
 
 import com.sorhive.comprojectserver.member.command.domain.model.member.Member;
-import com.sorhive.comprojectserver.member.command.domain.model.member.MemberId;
 import com.sorhive.comprojectserver.member.command.domain.repository.MemberRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,14 +44,14 @@ public class CustomUserDetailsService implements UserDetailsService {
         log.info("[CustomUserDetailsService] START ===================================");
         log.info("[CustomUserDetailsService] loadUserByUsername {}", memberId);
 
-        Member member = memberRepository.findByMemberId(MemberId.of(memberId));
+        Member member = memberRepository.findByMemberId(memberId);
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(member.getMemberRole().toString());
 
         Collection<? extends GrantedAuthority> collection = Arrays.asList(grantedAuthority);
 
         member.setAuthorities(collection);
 
-        if(member == null) {
+        if (member == null) {
             throw new UsernameNotFoundException("해당 회원 정보는 존재하지 않습니다.");
         }
         log.info("[CustomUserDetailsService] END ===================================");

@@ -48,9 +48,9 @@
           from tbl_members a
           left join tbl_follows b on a.member_code = b.following_id
          where b.follower_id = #{ memberCode }
-           and a.member_delete_yn = 'N'
+           and a.deleted = false
            and a.member_role = 'ROLE_MEMBER'
-           and b.follow_delete_yn = 'N'
+           and b.deleted = false
          order by a.member_lifing_yn desc
          limit 30 offset #{ offset }
     </select>
@@ -68,9 +68,9 @@
           from tbl_members a
           left join tbl_follows b on a.member_code = b.following_id
          where b.follower_id = #{ memberCode }
-           and a.member_delete_yn = 'N'
+           and a.deleted = false
            and a.member_role = 'ROLE_MEMBER'
-           and b.follow_delete_yn = 'N'
+           and b.deleted = false
          limit 6
     </select>
 
@@ -89,7 +89,7 @@
           from tbl_members a
           left join tbl_follows b on a.member_code = b.following_id
          where a.member_code = #{ memberCode }
-           and a.member_delete_yn = 'N'
+           and a.deleted = false
            and a.member_role = 'ROLE_MEMBER'
     </select>
 
@@ -97,7 +97,7 @@
         select
                max(member_code)
           from tbl_members
-         where member_delete_yn = 'N'
+         where deleted = false
            and member_role = 'ROLE_MEMBER'
     </select>
 
@@ -106,7 +106,7 @@
                count(feed_writer_code)
           from tbl_feeds
          where feed_writer_code = #{memberCode}
-           and feed_delete_yn = 'N'
+           and deleted = false
     </select>
 
     <select id="countFollower" resultType="int">
@@ -114,7 +114,7 @@
                count(follower_id)
           from tbl_follows
          where following_id = #{memberCode}
-           and follow_delete_yn = 'N'
+           and deleted = false
     </select>
 
     <select id="countFollowing" resultType="int">
@@ -122,7 +122,7 @@
                count(following_id)
           from tbl_follows
          where follower_id = #{memberCode}
-           and follow_delete_yn = 'N'
+           and deleted = false
     </select>
 
     <select id="findFolloingSummary" resultMap="followResultMap">
@@ -133,7 +133,7 @@
           from tbl_follows
          where follower_id = #{ownMemberCode}
            and following_id = #{memberCode}
-           and follow_delete_yn = 'N'
+           and deleted = false
          group by following_id
     </select>
 
@@ -145,7 +145,7 @@
           from tbl_follows
          where following_id = #{ownMemberCode}
            and follower_id = #{memberCode}
-           and follow_delete_yn = 'N'
+           and deleted = false
          group by following_id
     </select>
 </mapper>

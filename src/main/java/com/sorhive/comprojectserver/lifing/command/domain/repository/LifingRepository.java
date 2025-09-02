@@ -1,7 +1,7 @@
 package com.sorhive.comprojectserver.lifing.command.domain.repository;
 
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifing.Lifing;
-import org.springframework.data.repository.Repository;
+import com.sorhive.comprojectserver.lifing.command.domain.model.Lifing;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
@@ -19,11 +19,6 @@ import java.util.Optional;
  * @author 부시연(최초 작성자)
  * @version 1(클래스 버전)
  */
-public interface LifingRepository extends Repository<Lifing, Long> {
-
-    void save(Lifing lifing);
-
-    Lifing findByLifingId(Long lifingId);
-
-    Optional<Lifing> findByLifingIdAndDeleteYnEquals(Long lifingId, char n);
+public interface LifingRepository extends JpaRepository<Lifing, Long> {
+    Optional<Lifing> findByLifingIdAndDeletedEquals(Long lifingId, boolean deletedYn);
 }

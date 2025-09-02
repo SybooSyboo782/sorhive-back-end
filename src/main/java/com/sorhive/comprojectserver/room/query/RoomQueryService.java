@@ -1,23 +1,22 @@
 package com.sorhive.comprojectserver.room.query;
 
 import com.sorhive.comprojectserver.config.jwt.TokenProvider;
-import com.sorhive.comprojectserver.member.command.domain.model.member.MemberCode;
+import com.sorhive.comprojectserver.member.command.domain.model.member.Member;
+import com.sorhive.comprojectserver.member.command.domain.repository.MemberRepository;
+import com.sorhive.comprojectserver.member.command.exception.NoMemberException;
+import com.sorhive.comprojectserver.room.command.domain.model.RoomVisit;
+import com.sorhive.comprojectserver.room.command.domain.model.room.MongoRoom;
+import com.sorhive.comprojectserver.room.command.domain.model.room.Room;
 import com.sorhive.comprojectserver.room.command.domain.repository.MongoRoomRepository;
 import com.sorhive.comprojectserver.room.command.domain.repository.RoomRepository;
 import com.sorhive.comprojectserver.room.command.domain.repository.RoomVisitRepository;
-import com.sorhive.comprojectserver.room.command.domain.room.MongoRoom;
-import com.sorhive.comprojectserver.room.command.domain.room.Room;
-import com.sorhive.comprojectserver.room.command.domain.room.RoomId;
-import com.sorhive.comprojectserver.room.command.domain.roomvisit.RoomVisit;
 import com.sorhive.comprojectserver.room.execption.NoRoomException;
-import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * <pre>
@@ -40,9 +39,11 @@ import java.util.Optional;
  * @see (참고할 class 또는 외부 url)
  */
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Slf4j
+@Transactional(readOnly = true)
 public class RoomQueryService {
-    private static final Logger log = LoggerFactory.getLogger(RoomQueryService.class);
+    private final MemberRepository memberRepository;
     private RoomDataDao roomDataDao;
     private RoomRepository roomRepository;
     private RoomVisitRepository roomVisitRepository;
@@ -51,7 +52,6 @@ public class RoomQueryService {
     private GuestBookDataDao guestBookDataDao;
     private TokenProvider tokenProvider;
 
-
     /* 방 상세 조회*/
     @Transactional
     public RoomDetailResponseDto selectRoomDetail(String accessToken, Long roomId) {
@@ -59,23 +59,27 @@ public class RoomQueryService {
 
         Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
 
+        Member visitor = memberRepository.findByMemberCode(memberCode)
+                .orElseThrow(() -> new NoMemberException("Member not found with code: " + memberCode));
+
         Room room = roomRepository.findById(roomId);
 
-        if(room == null) {
+        if (room == null) {
             throw new NoRoomException("룸 데이터가 존재하지 않습니다.");
         }
 
         /* 방문하려는 사람의 방이 방 주인이 아닐 경우 */
-        if(roomId != memberCode) {
+        boolean notRoomOwner = roomId.equals(memberCode);
+        if (notRoomOwner) {
 
             /* 방의 조회수 증가 */
-            room.setRoomCount(1L);
+            room.addRoomCount(1L);
             roomRepository.save(room);
 
             /* 방문 기록 저장 */
             RoomVisit roomVisit = new RoomVisit(
-                    new MemberCode(memberCode),
-                    new RoomId(roomId)
+                    visitor,
+                    room
             );
 
             roomVisitRepository.save(roomVisit);
@@ -87,33 +91,34 @@ public class RoomQueryService {
         String roomNo = roomData.getRoomNo();
 
         /* 몽고 DB에 있는 해당 룸 데이터 조회하기 */
-        Optional<MongoRoom> mongoRooms = mongoRoomRepository.findById(roomNo);
+        MongoRoom mongoRooms = mongoRoomRepository.findById(roomNo)
+                .orElseThrow(() -> new NoRoomException("해당하는 방이 없습니다."));
 
         /* 방 상세 조회 응답 객체 생성 및 정보 담기 */
         RoomDetailResponseDto roomDetailResponseDto = new RoomDetailResponseDto(
                 roomData.getId(),
-                mongoRooms.get().getRoomCreator(),
-                mongoRooms.get().getFurnitures(),
-                mongoRooms.get().getId()
+                mongoRooms.getRoomCreator().getMemberCode(),
+                mongoRooms.getRoomCreator().getMemberName(),
+                mongoRooms.getRoomCreator().getMemberId(),
+                mongoRooms.getFurnitures(),
+                mongoRooms.getId()
         );
 
+        /* 방명록 리스트 가져오기 */
+        List<GuestBookData> guestBookData = guestBookDataDao.findByRoomIdAndDeletedEquals(roomId, false);
+
         /* 만약 방에 삭제가 안된 방명록이 있다면 */
-        if(guestBookDataDao.findByRoomIdAndGuestBookDeleteYnEquals(roomId, 'N') != null) {
-
-            /* 방명록 리스트 가져오기 */
-            List<GuestBookData> guestBookData =  guestBookDataDao.findByRoomIdAndGuestBookDeleteYnEquals(roomId, 'N');
-
+        if (!guestBookData.isEmpty()) {
             /* 응답 객체에 방명록 리스트 담기 */
             roomDetailResponseDto.setGuestBookDataList(guestBookData);
-
         }
 
+        /* 가구 이미지 리스트 가져오기 */
+        List<FurnitureImageData> furnitureImageData =
+                furnitureImageDataDao.findByRoomIdAndDeletedEquals(roomId, false);
+
         /* 만약 방에 삭제가 안 된 가구이미지가 있다면 */
-        if(furnitureImageDataDao.findByRoomIdAndDeleteYnEquals(roomId, 'N') != null) {
-
-            /* 가구 이미지 리스트 가져오기 */
-            List<FurnitureImageData> furnitureImageData = furnitureImageDataDao.findByRoomIdAndDeleteYnEquals(roomId, 'N');
-
+        if (!furnitureImageData.isEmpty()) {
             /* 응답 객체에 가구 이미지 리스트 담기 */
             roomDetailResponseDto.setFurnitureImageDataList(furnitureImageData);
         }

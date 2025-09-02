@@ -10,7 +10,7 @@
         <result property="feedWriterName" column="feed_writer_name"/>
         <result property="feedWriterId" column="feed_writer_id"/>
         <result property="feedCreateTime" column="feed_create_time"/>
-        <result property="feedDeleteYn" column="feed_delete_yn"/>
+        <result property="deleted" column="deleted"/>
         <result property="honeyCount" column="honey_count"/>
         <association property="feedImageSummary" resultMap="feedImageResultMap"></association>
         <association property="feedCommentSummary" resultMap="feedCommentResultMap"></association>
@@ -28,7 +28,7 @@
         <result property="feedCommentWriterName" column="feed_comment_writer_name"/>
         <result property="feedCommentWriterId" column="feed_comment_writer_id"/>
         <result property="feedCommentCreateTime" column="feed_comment_create_time"/>
-        <result property="feedCommentDeleteYn" column="feed_comment_delete_yn"/>
+        <result property="deleted" column="deleted"/>
     </resultMap>
 
     <select id="selectAllFeed" resultMap="feedResultMap">
@@ -43,7 +43,7 @@
           from tbl_feeds a
           left join tbl_feed_images b on(a.feed_id = b.feed_id)
          where a.feed_writer_code = #{memberCode}
-           and a.feed_delete_yn = 'N'
+           and deleted = false
          order by a.feed_id desc
          limit 5 offset #{ pageNo }
     </select>
@@ -58,7 +58,7 @@
              , feed_delete_yn
           from tbl_feeds
          where feed_id = #{feedId}
-           and feed_delete_yn = 'N'
+           and deleted = false
     </select>
 
     <select id="selectAllFeedComments" resultMap="feedCommentResultMap">
@@ -71,7 +71,7 @@
              , feed_comment_delete_yn
           from tbl_feed_comments
          where feed_id = #{feedId}
-           and feed_comment_delete_yn = 'N'
+           and deleted = false
          order by feed_comment_id desc
     </select>
 
@@ -82,7 +82,7 @@
              , feed_image_original_name
           from tbl_feed_images
          where feed_id = #{feedId}
-           and feed_image_delete_yn = 'N'
+           and deleted = false
     </select>
 
     <select id="selectFeedCount" resultType="_int">
@@ -90,7 +90,7 @@
                count(feed_writer_code) as feedCount
           from tbl_feeds
          where feed_writer_code = #{memberCode}
-           and feed_delete_yn = 'N'
+           and deleted = false
     </select>
 
 </mapper>

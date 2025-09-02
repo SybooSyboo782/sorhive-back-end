@@ -3,6 +3,7 @@ package com.sorhive.comprojectserver.feed.command.application.dto;
 import lombok.Getter;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * <pre>
@@ -28,12 +29,12 @@ public class FeedHoneyResponseDeleteDto {
     private Long feedId;
     private Timestamp deleteTime;
 
-    public FeedHoneyResponseDeleteDto(Long id, Long feedId, Long memberCode, Timestamp deleteTime) {
+    public FeedHoneyResponseDeleteDto(Long id, Long feedId, Long memberCode, LocalDateTime deleteTime) {
 
         this.feedHoneyId = id;
         this.memberCode = memberCode;
         this.feedId = feedId;
-        this.deleteTime = deleteTime;
+        this.deleteTime = Timestamp.valueOf(deleteTime);
 
     }
 }

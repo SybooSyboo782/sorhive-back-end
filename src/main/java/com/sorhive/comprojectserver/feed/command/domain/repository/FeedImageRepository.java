@@ -1,8 +1,8 @@
 package com.sorhive.comprojectserver.feed.command.domain.repository;
 
-import com.sorhive.comprojectserver.feed.command.domain.model.feed.Feed;
-import com.sorhive.comprojectserver.feed.command.domain.model.feedimage.FeedImage;
-import org.springframework.data.repository.Repository;
+import com.sorhive.comprojectserver.feed.command.domain.model.Feed;
+import com.sorhive.comprojectserver.feed.command.domain.model.FeedImage;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
@@ -24,13 +24,9 @@ import java.util.List;
  * @version 1(클래스 버전)
  * @see (참고할 class 또는 외부 url)
  */
-public interface FeedImageRepository extends Repository<FeedImage, Long> {
-
-    void save(FeedImage feedImage);
+public interface FeedImageRepository extends JpaRepository<FeedImage, Long> {
 
     List<FeedImage> findByFeed(Feed feed);
 
-    FeedImage findById(Long aLong);
-
-    FeedImage findByIdAndDeleteYnEquals(Long feedImageId, char n);
+    FeedImage findByIdAndDeletedEquals(Long feedImageId, boolean deletedYn);
 }

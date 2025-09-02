@@ -13,8 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 /**
  * <pre>
  * Class : MemberService
@@ -53,23 +51,19 @@ public class MemberService {
 
         Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
 
-        Optional<Member> memberData =  memberRepository.findByMemberCode(memberCode);
-
-        Member member = memberData.get();
+        Member member = memberRepository.findByMemberCode(memberCode)
+                .orElseThrow(() -> new NoMemberException("Member not found with code: " + memberCode));
 
         member.updateMember(memberModifyRequestDto.getName());
 
         memberRepository.save(member);
 
-        MemberModifyResponseDto memberModifyResponseDto = new MemberModifyResponseDto(
+        return new MemberModifyResponseDto(
                 member.getMemberCode(),
                 member.getMemberId(),
                 member.getMemberName(),
-                member.getUploadTime()
+                member.getUpdateDate()
         );
-
-        return memberModifyResponseDto;
-
     }
 
     /** 비밀번호 수정 */
@@ -80,16 +74,10 @@ public class MemberService {
 
         Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
 
-        if(memberRepository.findByMemberCode(memberCode) == null) {
-            log.warn("[NoMemberException]");
-            throw new NoMemberException("해당 회원은 존재하지 않습니다.");
-        }
+        Member member = memberRepository.findByMemberCode(memberCode)
+                .orElseThrow(() -> new NoMemberException("Member not found with code: " + memberCode));
 
-        Optional<Member> memberData =  memberRepository.findByMemberCode(memberCode);
-
-        Member member = memberData.get();
-
-        if(!passwordEncoder.matches(passwordModifyRequestDto.getPassword(), member.getPassword())) {
+        if (!passwordEncoder.matches(passwordModifyRequestDto.getPassword(), member.getPassword())) {
             throw new FailedModifyPasswordException("비밀번호가 일치하지 않습니다.");
         }
 

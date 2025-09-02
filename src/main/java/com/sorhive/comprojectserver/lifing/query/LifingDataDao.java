@@ -19,6 +19,4 @@ import org.springframework.data.repository.Repository;
  * @see (참고할 class 또는 외부 url)
  */
 public interface LifingDataDao extends Repository<LifingData, Long> {
-
-    LifingData findLifingDataByLifingIdAndDeleteYnEquals(Long lifingId, char n);
 }

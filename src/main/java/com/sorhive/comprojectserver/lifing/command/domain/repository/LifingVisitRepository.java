@@ -1,7 +1,7 @@
 package com.sorhive.comprojectserver.lifing.command.domain.repository;
 
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifingvisit.LifingVisit;
-import org.springframework.data.repository.Repository;
+import com.sorhive.comprojectserver.lifing.command.domain.model.LifingVisit;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * <pre>
@@ -18,6 +18,5 @@ import org.springframework.data.repository.Repository;
  * @version 1(클래스 버전)
  * @see (참고할 class 또는 외부 url)
  */
-public interface LifingVisitRepository extends Repository<LifingVisit, Long> {
-    void save(LifingVisit lifingVisit);
+public interface LifingVisitRepository extends JpaRepository<LifingVisit, Long> {
 }

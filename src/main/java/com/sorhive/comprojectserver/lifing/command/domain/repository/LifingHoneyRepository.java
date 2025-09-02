@@ -1,9 +1,7 @@
 package com.sorhive.comprojectserver.lifing.command.domain.repository;
 
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifing.LifingId;
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifinghoney.LifingHoney;
-import com.sorhive.comprojectserver.member.command.domain.model.member.MemberCode;
-import org.springframework.data.repository.Repository;
+import com.sorhive.comprojectserver.lifing.command.domain.model.LifingHoney;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
@@ -23,9 +21,7 @@ import java.util.Optional;
  * @version 1(클래스 버전)
  * @see (참고할 class 또는 외부 url)
  */
-public interface LifingHoneyRepository extends Repository<LifingHoney, Long> {
-    
-    void save(LifingHoney lifingHoney);
-    Optional<LifingHoney> findByMemberCodeAndLifingIdAndDeleteYnEquals(MemberCode memberCode, LifingId lifingId, char n);
+public interface LifingHoneyRepository extends JpaRepository<LifingHoney, Long> {
+    Optional<LifingHoney> findByMemberMemberCodeAndLifingLifingIdAndDeletedEquals(Long memberCode, Long lifingId, boolean deletedYn);
 
 }

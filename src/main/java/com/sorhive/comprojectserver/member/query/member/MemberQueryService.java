@@ -1,6 +1,7 @@
 package com.sorhive.comprojectserver.member.query.member;
 
 import com.sorhive.comprojectserver.config.jwt.TokenProvider;
+import com.sorhive.comprojectserver.lifing.command.application.exception.NoLifingException;
 import com.sorhive.comprojectserver.member.command.domain.model.member.MemberRole;
 import com.sorhive.comprojectserver.member.command.exception.NoMemberException;
 import com.sorhive.comprojectserver.member.query.avatar.AvatarData;
@@ -15,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
+
+import static com.sorhive.comprojectserver.member.command.domain.model.member.MemberRole.ROLE_MEMBER;
 
 /**
  * <pre>
@@ -67,7 +70,7 @@ public class MemberQueryService {
         log.info("[MemberQueryService] getMemberData Start ================");
         log.info("[MemberQueryService] memberId : " + memberId);
 
-        MemberData memberData = memberDataDao.findByIdAndDeleteYnAndMemberRole(memberId, 'N', MemberRole.valueOf("ROLE_MEMBER"));
+        MemberData memberData = memberDataDao.findByIdAndDeletedAndMemberRole(memberId, false, MemberRole.ROLE_MEMBER);
         if (memberData == null) {
             throw new NoMemberException();
         }
@@ -80,13 +83,8 @@ public class MemberQueryService {
         log.info("[MemberQueryService] getMemberData Start ================");
         log.info("[MemberQueryService] memberCode : " + memberCode);
 
-        MemberData memberData = memberDataDao.findByMemberCodeAndMemberRole(memberCode, MemberRole.valueOf("ROLE_MEMBER"));
-        if(memberData == null) {
-            throw new NoMemberException();
-        }
-
-        return memberData;
-
+        return memberDataDao.findByMemberCodeAndMemberRole(memberCode, ROLE_MEMBER)
+                .orElseThrow(() -> new NoMemberException("해당하는 회원이 없습니다."));
     }
 
     /** 회원 ID 검색 */
@@ -97,8 +95,8 @@ public class MemberQueryService {
 
         Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
 
-        List<MemberData> memberData = memberDataDao.findByIdLikeAndMemberCodeIsNotAndMemberRole("%" + memberId + "%", memberCode, MemberRole.valueOf("ROLE_MEMBER"));
-        if(memberData == null) {
+        List<MemberData> memberData = memberDataDao.findByIdLikeAndMemberCodeIsNotAndMemberRole("%" + memberId + "%", memberCode, MemberRole.ROLE_MEMBER);
+        if (memberData == null) {
             throw new NoMemberException();
         }
 
@@ -113,9 +111,9 @@ public class MemberQueryService {
 
         Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
 
-        List<MemberData> memberData = memberDataDao.findAllByMemberCodeIsNotAndDeleteYnAndMemberRole(memberCode, 'N', MemberRole.valueOf("ROLE_MEMBER"));
+        List<MemberData> memberData = memberDataDao.findAllByMemberCodeIsNotAndDeletedAndMemberRole(memberCode, false, MemberRole.ROLE_MEMBER);
 
-        if(memberData == null) {
+        if (memberData == null) {
             throw new NoMemberException();
         }
 
@@ -123,7 +121,8 @@ public class MemberQueryService {
 
         List<MemberData> memberDataList = new ArrayList<>();
 
-        MemberData ownMemberData = memberDataDao.findByMemberCodeAndMemberRole(memberCode, MemberRole.valueOf("ROLE_MEMBER"));
+        MemberData ownMemberData = memberDataDao.findByMemberCodeAndMemberRole(memberCode, MemberRole.ROLE_MEMBER)
+                .orElseThrow(() -> new NoLifingException("해당하는 회원이 없습니다."));
 
         memberDataList.add(ownMemberData);
 
@@ -150,13 +149,13 @@ public class MemberQueryService {
 
                 for (int k = 0; k < maxMemberCode; k++) {
 
-                    MemberData tempMemberData = memberDataDao.findByMemberCodeAndMemberCodeIsNotAndMemberRole((long) memberSize[k], memberCode, MemberRole.valueOf("ROLE_MEMBER"));
+                    MemberData tempMemberData = memberDataDao.findByMemberCodeAndMemberCodeIsNotAndMemberRole((long) memberSize[k], memberCode, MemberRole.ROLE_MEMBER);
 
                     if (tempMemberData != null) {
 
                         memberDataList.add(tempMemberData);
                         count++;
-                        if(count == 6 || count == maxMemberCode)  {
+                        if (count == 6 || count == maxMemberCode)  {
                             break;
                         }
                     }
@@ -165,7 +164,7 @@ public class MemberQueryService {
         }
 
         /* 자신의 아바타 정보 불러오기 */
-        if(avatarDataDao.findByMemberCode(memberCode) != null) {
+        if (avatarDataDao.findByMemberCode(memberCode) != null) {
 
             AvatarData ownAvatarData = avatarDataDao.findByMemberCode(memberCode);
             findRandomMemberResponseDto.setOwnAvatarData(ownAvatarData);
@@ -192,12 +191,9 @@ public class MemberQueryService {
         List<MemberData> resultMemberDataList = new ArrayList<>();
 
         /* 회원번호로 조회하기 */
-        MemberData followerMemberData = memberDataDao.findByMemberCodeAndMemberRole(roomId, MemberRole.valueOf("ROLE_MEMBER"));
-
-        if(followerMemberData == null) {
-            throw new NoMemberException("회원 정보가 없습니다");
-        }
-
+        MemberData followerMemberData = memberDataDao.findByMemberCodeAndMemberRole(roomId, MemberRole.ROLE_MEMBER)
+                .orElseThrow(() -> new NoMemberException("해당하는 회원이 없습니다."));
+        
         tempMemberDataList.add(followerMemberData);
 
         /* 팔로워의 팔로잉 조회 */
@@ -207,7 +203,7 @@ public class MemberQueryService {
         followerCount = followerMemberDataList.size();
 
         /* 팔로워의 팔로잉 목록이 있다면 하나씩 꺼내서 tempMemberDataList에 넣어준다. */
-        if(followerMemberDataList != null ){
+        if (followerMemberDataList != null ){
 
             for (int i = 0; i < followerMemberDataList.size(); i++) {
 
@@ -247,7 +243,7 @@ public class MemberQueryService {
             for (int k = 0; k < maxMemberCode; k++) {
 
                 /* 해당 멤버코드를 제외한 회원들을 조회한다. */
-                MemberData tempMemberData = memberDataDao.findByMemberCodeAndMemberCodeIsNotAndMemberRole((long) memberSize[k], memberCode, MemberRole.valueOf("ROLE_MEMBER"));
+                MemberData tempMemberData = memberDataDao.findByMemberCodeAndMemberCodeIsNotAndMemberRole((long) memberSize[k], memberCode, MemberRole.ROLE_MEMBER);
 
                 if (tempMemberData != null) {
 
@@ -255,7 +251,7 @@ public class MemberQueryService {
                     count++;
 
                     /* 6명이 되거나 최대회원수가 6명도 채 안되면 그 회원 수만큼만 조회하고 무한루프를 탈출한다. */
-                    if(count == (6) || count == maxMemberCode)  {
+                    if (count == (6) || count == maxMemberCode)  {
                         break;
                     }
                 }
@@ -272,7 +268,7 @@ public class MemberQueryService {
         }
         
         /* 자신의 아바타 정보 불러오기 */
-        if(avatarDataDao.findByMemberCode(memberCode) != null) {
+        if (avatarDataDao.findByMemberCode(memberCode) != null) {
 
             AvatarData ownAvatarData = avatarDataDao.findByMemberCode(memberCode);
             findRoomInMemberResponseDto.setOwnAvatarData(ownAvatarData);
@@ -296,7 +292,7 @@ public class MemberQueryService {
         Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
 
         /* 자신을 제외한 모든 회원 조회하기 */
-        List<MemberData> memberData = memberDataDao.findAllByMemberCodeIsNotAndDeleteYnAndMemberRole(memberCode, 'N', MemberRole.valueOf("ROLE_MEMBER"));
+        List<MemberData> memberData = memberDataDao.findAllByMemberCodeIsNotAndDeletedAndMemberRole(memberCode, false, MemberRole.ROLE_MEMBER);
 
         if (memberData == null) {
             throw new NoMemberException();
@@ -316,7 +312,7 @@ public class MemberQueryService {
         MemberSummary memberSummary = memberMapper.findOneByMemberCode(memberCode);
 
         /* 회원 상세 정보 응답 전송 객체 만들고 값 넣어주기 */
-        MypageDto mypageDto = new MypageDto(
+        return new MypageDto(
                 memberSummary.getMemberId(),
                 memberSummary.getMemberCode(),
                 memberSummary.getMemberName(),
@@ -325,7 +321,6 @@ public class MemberQueryService {
                 memberMapper.countFollower(memberCode),
                 memberMapper.countFollowing(memberCode)
         );
-        return mypageDto;
     }
 
 
@@ -336,19 +331,19 @@ public class MemberQueryService {
 
         Long ownMemberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
 
-        if(memberDataDao.findByMemberCodeAndMemberRole(memberCode, MemberRole.valueOf("ROLE_MEMBER")) == null) {
+        if (memberDataDao.findByMemberCodeAndMemberRole(memberCode, MemberRole.ROLE_MEMBER) == null) {
             log.warn("[selectMemberByMemberCode]");
             log.warn("[NoMemberException]");
             throw new NoMemberException("해당하는 회원이 없습니다.");
         }
 
-        if(memberMapper.findOneByMemberCode(memberCode) == null) {
+        if (memberMapper.findOneByMemberCode(memberCode) == null) {
 
-            if(memberMapper.findByMemberCode(memberCode) != null) {
+            if (memberMapper.findByMemberCode(memberCode) != null) {
 
-                MemberData memberSummary = memberDataDao.findFirstByMemberCodeAndDeleteYnAndMemberRole(memberCode, 'N', MemberRole.valueOf("ROLE_MEMBER"));
+                MemberData memberSummary = memberDataDao.findFirstByMemberCodeAndDeletedAndMemberRole(memberCode, false, MemberRole.ROLE_MEMBER);
 
-                MypageDto mypageDto = new MypageDto(
+                return new MypageDto(
                         memberSummary.getId(),
                         memberSummary.getMemberCode(),
                         memberSummary.getName(),
@@ -357,8 +352,6 @@ public class MemberQueryService {
                         memberMapper.countFollower(memberCode),
                         memberMapper.countFollowing(memberCode)
                 );
-
-                return mypageDto;
             }
 
         }
@@ -377,7 +370,7 @@ public class MemberQueryService {
                 memberMapper.countFollowing(memberCode)
         );
 
-        if(memberMapper.findFolloingSummary(memberCode, ownMemberCode) != null){
+        if (memberMapper.findFolloingSummary(memberCode, ownMemberCode) != null){
             FollowSummary followingSummary = memberMapper.findFolloingSummary(memberCode, ownMemberCode);
             mypageDto.addFollowingSummary(followingSummary);
         } else {
@@ -385,7 +378,7 @@ public class MemberQueryService {
             mypageDto.addFollowingSummary(followingSummary);
         }
 
-        if(memberMapper.findFollowerSummary(memberCode, ownMemberCode) != null){
+        if (memberMapper.findFollowerSummary(memberCode, ownMemberCode) != null){
             FollowSummary followerSummary = memberMapper.findFollowerSummary(memberCode, ownMemberCode);
             mypageDto.addFollowerSummary(followerSummary);
         } else {

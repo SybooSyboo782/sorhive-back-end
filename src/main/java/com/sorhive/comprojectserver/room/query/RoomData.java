@@ -1,12 +1,12 @@
 package com.sorhive.comprojectserver.room.query;
 
-import com.sorhive.comprojectserver.room.command.domain.guestbook.GuestBook;
-import com.sorhive.comprojectserver.room.command.domain.roomvisit.RoomVisit;
+import com.sorhive.comprojectserver.room.command.domain.model.GuestBook;
+import com.sorhive.comprojectserver.room.command.domain.model.RoomVisit;
+import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
-import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;

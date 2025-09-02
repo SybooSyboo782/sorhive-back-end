@@ -57,7 +57,7 @@ public class ChattingInfraService {
         log.info("[ChattingInfraService] createChatting Start ===================");
         log.info("[ChattingInfraService] chattingCreateDto " + chattingCreateRequestDto);
 
-        if((chattingCreateRequestDto.getMessages() ==null ) || (chattingCreateRequestDto.getMemberCode1() == null) || (chattingCreateRequestDto.getMemberCode2() == null)) {
+        if ((chattingCreateRequestDto.getMessages() ==null ) || (chattingCreateRequestDto.getMemberCode1() == null) || (chattingCreateRequestDto.getMemberCode2() == null)) {
             throw new NoContentException("채팅 정보나 방번호가 존재하질 않습니다.");
         }
 
@@ -75,7 +75,7 @@ public class ChattingInfraService {
         String memberRoomImage2 = member1.getRoomImagePath();
 
         /* membercode1은 작은값 membercode 2는 큰값으로 맞춘다. */
-        if(memberCode1 > memberCode2) {
+        if (memberCode1 > memberCode2) {
             Long temp = 0L;
             temp = memberCode1;
             memberCode1 = memberCode2;
@@ -86,7 +86,7 @@ public class ChattingInfraService {
 
         MongoChatting oldMongoChatting = mongoChattingRepository.findFirstByMemberCode1AndMemberCode2OrderByCounterDesc(memberCode1, memberCode2);
 
-        if(oldMongoChatting != null) {
+        if (oldMongoChatting != null) {
 
             /* 키값 중복때문에 기존에 있던 채팅 이력은 삭제한다. */
             mongoChattingRepository.deleteById(oldMongoChatting.getId());

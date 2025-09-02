@@ -1,10 +1,8 @@
 package com.sorhive.comprojectserver.member.command.domain.repository;
 
-import com.sorhive.comprojectserver.member.command.domain.model.follow.Follow;
-import com.sorhive.comprojectserver.member.command.domain.model.follow.FollowerId;
-import com.sorhive.comprojectserver.member.command.domain.model.follow.FollowingId;
+import com.sorhive.comprojectserver.member.command.domain.model.Follow;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
@@ -24,18 +22,16 @@ import java.util.Optional;
  * @version 1(클래스 버전)
  * @see (참고할 class 또는 외부 url)
  */
-public interface FollowRepository extends Repository<Follow, Long> {
+public interface FollowRepository extends JpaRepository<Follow, Long> {
 
-    void save(Follow follow);
-
-    Optional<Follow> findByFollowIdAndDeleteYnEquals(Long id, Character n);
+    Optional<Follow> findByFollowIdAndDeletedEquals(Long id, boolean n);
 
 
     @Query(value = "select follow " +
             "from Follow follow " +
-            "where follow.deleteYn = 'N' " +
+            "where follow.deleted = false " +
             "and follow.followingId = :followingId " +
             "and follow.followerId = :followerId")
-    Optional<Follow> findByFollowingId(@Param("followerId")FollowerId followerId, @Param("followingId")FollowingId followingId);
+    Optional<Follow> findByFollowingId(@Param("followerId")Long followerId, @Param("followingId")Long followingId);
 
 }

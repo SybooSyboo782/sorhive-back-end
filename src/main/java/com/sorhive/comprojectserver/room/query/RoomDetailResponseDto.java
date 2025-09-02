@@ -1,6 +1,5 @@
 package com.sorhive.comprojectserver.room.query;
 
-import com.sorhive.comprojectserver.room.command.domain.room.RoomCreator;
 import lombok.Getter;
 
 import java.util.List;
@@ -26,18 +25,21 @@ public class RoomDetailResponseDto {
 
     private Long roomId;
     private String mongoRoomid;
-    private RoomCreator roomCreator;
+    private Long roomCreator;
+    private String roomCreatorName;
+    private String roomCreatorId;
     private List<GuestBookData> guestBookDataList;
     private List<FurnitureImageData> furnitureImageDataList;
     private List<Map<String,Object>> furnitures;
 
-    public RoomDetailResponseDto(Long roomId, RoomCreator roomCreator, List<Map<String, Object>> furnitures, String mongoRoomid) {
-
+    public RoomDetailResponseDto(Long roomId, Long roomCreator, String roomCreatorName, String roomCreatorId,
+                                 List<Map<String, Object>> furnitures, String mongoRoomid) {
         this.roomId = roomId;
         this.mongoRoomid = mongoRoomid;
         this.roomCreator = roomCreator;
+        this.roomCreatorName = roomCreatorName;
+        this.roomCreatorId = roomCreatorId;
         this.furnitures = furnitures;
-        
     }
 
     public void setGuestBookDataList(List<GuestBookData> guestBookDataList) {

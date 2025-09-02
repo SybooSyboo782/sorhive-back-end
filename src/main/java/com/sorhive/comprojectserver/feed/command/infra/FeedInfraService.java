@@ -4,11 +4,9 @@ import com.sorhive.comprojectserver.common.exception.AlreadyDeleteException;
 import com.sorhive.comprojectserver.common.exception.NotSameWriterException;
 import com.sorhive.comprojectserver.config.jwt.TokenProvider;
 import com.sorhive.comprojectserver.feed.command.application.dto.*;
-import com.sorhive.comprojectserver.feed.command.domain.model.feed.Feed;
-import com.sorhive.comprojectserver.feed.command.domain.model.feed.FeedWriter;
-import com.sorhive.comprojectserver.feed.command.domain.model.feed.FeedWriterService;
-import com.sorhive.comprojectserver.feed.command.domain.model.feedcomment.FeedComment;
-import com.sorhive.comprojectserver.feed.command.domain.model.feedimage.FeedImage;
+import com.sorhive.comprojectserver.feed.command.domain.model.Feed;
+import com.sorhive.comprojectserver.feed.command.domain.model.FeedComment;
+import com.sorhive.comprojectserver.feed.command.domain.model.FeedImage;
 import com.sorhive.comprojectserver.feed.command.domain.repository.FeedCommentRepository;
 import com.sorhive.comprojectserver.feed.command.domain.repository.FeedImageRepository;
 import com.sorhive.comprojectserver.feed.command.domain.repository.FeedRepository;
@@ -16,9 +14,11 @@ import com.sorhive.comprojectserver.feed.exception.NoFeedException;
 import com.sorhive.comprojectserver.feed.exception.NoFeedImageException;
 import com.sorhive.comprojectserver.feed.exception.NoRequiredFeedModifyException;
 import com.sorhive.comprojectserver.file.S3FeedImageFile;
-import com.sorhive.comprojectserver.member.command.domain.model.member.MemberCode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.sorhive.comprojectserver.member.command.domain.model.member.Member;
+import com.sorhive.comprojectserver.member.command.domain.repository.MemberRepository;
+import com.sorhive.comprojectserver.member.command.exception.NoMemberException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,24 +48,17 @@ import java.util.UUID;
  * @see (참고할 class 또는 외부 url)
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class FeedInfraService {
 
-    private static final Logger log = LoggerFactory.getLogger(FeedInfraService.class);
     private final TokenProvider tokenProvider;
     private final FeedRepository feedRepository;
     private final FeedImageRepository feedImageRepository;
     private final FeedCommentRepository feedCommentRepository;
-    private final FeedWriterService feedWriterService;
+    private final MemberRepository memberRepository;
     private final S3FeedImageFile s3FeedImageFile;
-
-    public FeedInfraService(TokenProvider tokenProvider, FeedRepository feedRepository, FeedImageRepository feedImageRepository, FeedCommentRepository feedCommentRepository, FeedWriterService feedWriterService, S3FeedImageFile s3FeedImageFile) {
-        this.tokenProvider = tokenProvider;
-        this.feedRepository = feedRepository;
-        this.feedImageRepository = feedImageRepository;
-        this.feedCommentRepository = feedCommentRepository;
-        this.feedWriterService = feedWriterService;
-        this.s3FeedImageFile = s3FeedImageFile;
-    }
 
     /**
      * 피드 생성
@@ -79,26 +72,26 @@ public class FeedInfraService {
         Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
 
         /* 피드 작성자 생성하기 */
-        FeedWriter feedWriter = feedWriterService.createFeedWriter(new MemberCode(memberCode));
+        Member feedWriter = memberRepository.findByMemberCode(memberCode)
+                .orElseThrow(() -> new NoMemberException("Member not found with code: " + memberCode));
         String feedContent = feedCreateRequestDto.getFeedContent();
 
         /* 피드 생성 */
         Feed feed = new Feed(
-                feedWriter,
-                feedContent
+                feedContent,
+                feedWriter
         );
 
         /* 피드 저장하기 */
         feedRepository.save(feed);
 
         /* 응답 객체 생성 */
-        FeedCreateResponseDto feedCreateResponseDto = new FeedCreateResponseDto(
+
+        return new FeedCreateResponseDto(
                 feed.getFeedId(),
-                feed.getFeedCreateTime(),
+                feed.getCreatedDate(),
                 feed.getFeedContent()
         );
-
-        return feedCreateResponseDto;
     }
 
     /**
@@ -124,15 +117,15 @@ public class FeedInfraService {
             throw new NoFeedException("해당 피드는 존재하지 않습니다.");
         }
 
-        if (feedRepository.findByFeedIdAndFeedDeleteYnEquals(feedId, 'N').isEmpty()) {
+        if (feedRepository.findByFeedIdAndDeletedEquals(feedId, false).isEmpty()) {
             log.warn("[FeedService] NoFeedException");
             throw new AlreadyDeleteException("해당 피드는 이미 삭제되었습니다.");
         }
 
-        Optional<Feed> feedData = feedRepository.findByFeedIdAndFeedDeleteYnEquals(feedId, 'N');
+        Optional<Feed> feedData = feedRepository.findByFeedIdAndDeletedEquals(feedId, false);
         Feed feed = feedData.get();
 
-        if (feed.getFeedWriter().getMemberCode().getValue() != memberCode) {
+        if (feed.getFeedWriter().getMemberCode() != memberCode) {
             log.warn("[FeedService] NotSameWriterException");
             throw new NotSameWriterException("해당 피드 작성자와 삭제 요청자가 다릅니다.");
         }
@@ -140,17 +133,14 @@ public class FeedInfraService {
         feed.modify(feedContent);
         feedRepository.save(feed);
 
-        FeedModifyResponseDto feedModifyResponseDto;
-
-        feedModifyResponseDto = new FeedModifyResponseDto(
+        return new FeedModifyResponseDto(
                 feed.getFeedId(),
-                feed.getFeedWriter(),
                 feed.getFeedContent(),
-                feed.getFeedUploadTime()
+                feed.getFeedWriter().getMemberCode(),
+                feed.getFeedWriter().getMemberName(),
+                feed.getFeedWriter().getMemberId(),
+                feed.getUpdateDate()
         );
-
-        return feedModifyResponseDto;
-
     }
 
     /**
@@ -169,27 +159,27 @@ public class FeedInfraService {
             throw new NoFeedException("해당 피드는 존재하지 않습니다.");
         }
 
-        if (feedRepository.findByFeedIdAndFeedDeleteYnEquals(feedId, 'N').isEmpty()) {
+        if (feedRepository.findByFeedIdAndDeletedEquals(feedId, false).isEmpty()) {
             log.warn("[FeedService] NoFeedException");
             throw new AlreadyDeleteException("해당 피드는 이미 삭제되었습니다.");
         }
 
-        Optional<Feed> feedData = feedRepository.findByFeedIdAndFeedDeleteYnEquals(feedId, 'N');
+        Optional<Feed> feedData = feedRepository.findByFeedIdAndDeletedEquals(feedId, false);
         Feed feed = feedData.get();
 
-        if (feed.getFeedWriter().getMemberCode().getValue() != memberCode) {
+        if (feed.getFeedWriter().getMemberCode() != memberCode) {
             log.warn("[FeedService] NotSameWriterException");
             throw new NotSameWriterException("해당 피드 작성자와 삭제 요청자가 다릅니다.");
         }
 
-        feed.delete();
+        feed.softDelete();
 
         /* 해당 피드에 대한 댓글이 있다면 */
         if (!feedCommentRepository.findByFeed(feed).isEmpty()) {
             List<FeedComment> feedCommentList = feedCommentRepository.findByFeed(feed);
 
             for (int i = 0; i < feedCommentList.size(); i++) {
-                feedCommentList.get(i).delete();
+                feedCommentList.get(i).softDelete();
                 feedCommentRepository.save(feedCommentList.get(i));
             }
         }
@@ -201,7 +191,7 @@ public class FeedInfraService {
             for (int i = 0; i < feedImages.size(); i++) {
 
                 /* 하나씩 꺼내서 삭제 여부를 Y로 바꾸어준다. */
-                feedImages.get(i).deleteImage();
+                feedImages.get(i).softDelete();
                 feedImageRepository.save(feedImages.get(i));
             }
         }
@@ -229,19 +219,17 @@ public class FeedInfraService {
             throw new NoFeedException("해당 피드는 존재하지 않습니다.");
         }
 
-        if (feedRepository.findByFeedIdAndFeedDeleteYnEquals(feedId, 'N').isEmpty()) {
+        if (feedRepository.findByFeedIdAndDeletedEquals(feedId, false).isEmpty()) {
             log.warn("[FeedService] NoFeedException");
             throw new AlreadyDeleteException("해당 피드는 이미 삭제되었습니다.");
         }
 
         Feed feed = feedRepository.findByFeedId(feedId);
 
-        if (feed.getFeedWriter().getMemberCode().getValue() != memberCode) {
+        if (feed.getFeedWriter().getMemberCode() != memberCode) {
             log.warn("[FeedService] NotSameWriterException");
             throw new NotSameWriterException("해당 피드 작성자와 삭제 요청자가 다릅니다.");
         }
-
-        FeedImageCreateResponseDto feedCreateResponseDto = null;
 
         try {
 
@@ -263,13 +251,11 @@ public class FeedInfraService {
 
                 feedImageRepository.save(feedImage);
 
-                feedCreateResponseDto = new FeedImageCreateResponseDto(
+                return new FeedImageCreateResponseDto(
                         feedImage.getId(),
-                        feedImage.getUploadTime(),
+                        feedImage.getUpdateDate(),
                         feedImage.getPath()
                 );
-
-                return feedCreateResponseDto;
 
             }
 
@@ -294,19 +280,19 @@ public class FeedInfraService {
             throw new NoFeedImageException("해당 피드는 존재하지 않습니다.");
         }
 
-        if (feedImageRepository.findByIdAndDeleteYnEquals(feedImageId, 'N') == null) {
+        if (feedImageRepository.findByIdAndDeletedEquals(feedImageId, false) == null) {
             log.warn("[FeedInfraService] NoFeedImageException");
             throw new AlreadyDeleteException("해당 피드 이미지는 이미 삭제되었습니다.");
         }
 
-        FeedImage feedImage = feedImageRepository.findByIdAndDeleteYnEquals(feedImageId, 'N');
+        FeedImage feedImage = feedImageRepository.findByIdAndDeletedEquals(feedImageId, false);
 
-        if (feedImage.getFeed().getFeedWriter().getMemberCode().getValue() != memberCode) {
+        if (feedImage.getFeed().getFeedWriter().getMemberCode() != memberCode) {
             log.warn("[FeedInfraService] NotSameWriterException");
             throw new NotSameWriterException("해당 피드 작성자와 삭제 요청자가 다릅니다.");
         }
 
-        feedImage.deleteImage();
+        feedImage.softDelete();
         feedImageRepository.save(feedImage);
 
         log.info("[FeedInfraService] deleteFeedImage End");

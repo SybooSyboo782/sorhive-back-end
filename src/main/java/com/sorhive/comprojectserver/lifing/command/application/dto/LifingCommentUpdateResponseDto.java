@@ -1,9 +1,11 @@
 package com.sorhive.comprojectserver.lifing.command.application.dto;
 
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifingcomment.LifingCommentWriter;
+import jakarta.validation.constraints.NotNull;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * <pre>
@@ -21,17 +23,30 @@ import java.sql.Timestamp;
  * @see (참고할 class 또는 외부 url)
  */
 @Getter
+@EqualsAndHashCode
 public class LifingCommentUpdateResponseDto {
 
+    @NotNull(message = "해당 댓글 수정에 필요한 내용이 없습니다.")
     private Long lifingCommentId;
+
+    @NotNull(message = "해당 댓글 수정에 필요한 내용이 없습니다.")
     private String lifingCommentContent;
-    private LifingCommentWriter lifingCommentWriter;
+
+    private Long lifingCommentWriterCode;
+
+    private String lifingCommentWriterName;
+
+    private String lifingCommentWriterId;
+
     private Timestamp lifingCommentUploadTime;
 
-    public LifingCommentUpdateResponseDto(Long lifingCommentId, String lifingCommentContent, LifingCommentWriter lifingCommentWriter, Timestamp lifingCommentUploadTime) {
+    public LifingCommentUpdateResponseDto(Long lifingCommentId, String lifingCommentContent, Long lifingCommentWriterCode,
+                                          String lifingCommentWriterName, String lifingCommentWriterId, LocalDateTime lifingCommentUploadTime) {
         this.lifingCommentId = lifingCommentId;
         this.lifingCommentContent = lifingCommentContent;
-        this.lifingCommentWriter = lifingCommentWriter;
-        this.lifingCommentUploadTime = lifingCommentUploadTime;
+        this.lifingCommentWriterCode = lifingCommentWriterCode;
+        this.lifingCommentWriterName = lifingCommentWriterName;
+        this.lifingCommentWriterId = lifingCommentWriterId;
+        this.lifingCommentUploadTime = Timestamp.valueOf(lifingCommentUploadTime);
     }
 }

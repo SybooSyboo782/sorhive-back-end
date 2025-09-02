@@ -40,12 +40,12 @@ public class FeedQueryService {
         Long memberCode = feedRequestDto.getMemberCode();
         int pageNo = feedRequestDto.getPageNo() - 1;
 
-        if(pageNo < 0) {
+        if (pageNo < 0) {
             pageNo = 0;
         }
 
         /* 피드가 없으면 예외처리 */
-        if(feedMapper.selectAllFeed(memberCode, pageNo).isEmpty()) {
+        if (feedMapper.selectAllFeed(memberCode, pageNo).isEmpty()) {
             throw new NoFeedException("피드가 없습니다.");
         }
 
@@ -76,14 +76,14 @@ public class FeedQueryService {
         FeedResponseDto feedResponseDto = new FeedResponseDto();
 
         /* 피드 없을 경우 예외 처리 */
-        if(feedMapper.selectFeedByFeedId(feedId) == null) {
+        if (feedMapper.selectFeedByFeedId(feedId) == null) {
             throw new NoFeedException();
         }
 
         feedResponseDto.setFeedSummary(feedMapper.selectFeedByFeedId(feedId));
 
         /* 피드에 이미지 있는지 확인 */
-        if(feedMapper.selectAllFeedImages(feedId) != null) {
+        if (feedMapper.selectAllFeedImages(feedId) != null) {
 
             log.info("[FeedQueryService] selectAllFeedImages Start ============" );
 
@@ -93,7 +93,7 @@ public class FeedQueryService {
         }
 
         /* 피드에 댓글 있는지 확인 */
-        if(feedMapper.selectAllFeedComments(feedId) != null) {
+        if (feedMapper.selectAllFeedComments(feedId) != null) {
 
             log.info("[FeedQueryService] selectAllFeedComments Start ============" );
 

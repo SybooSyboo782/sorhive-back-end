@@ -1,10 +1,8 @@
 package com.sorhive.comprojectserver.member.command.application.dto;
 
-import com.sorhive.comprojectserver.member.command.domain.model.member.MemberId;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import jakarta.validation.constraints.NotNull;
 
 /**
  * <pre>
@@ -25,7 +23,7 @@ import jakarta.validation.constraints.NotNull;
 public class LoginDto {
 
     @NotNull
-    private MemberId memberId;
+    private String memberId;
 
     @NotNull
     private String password;

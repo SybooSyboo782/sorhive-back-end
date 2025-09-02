@@ -24,12 +24,13 @@ public interface FollowDataDao extends JpaRepository<FollowData, Long> {
 
     @Query(value = "select follow " +
                      "from FollowData follow " +
-                    "where follow.followDeleteYn = 'N' " +
+                    "where follow.deleted = false " +
                       "and follow.followerId = :followerId")
     List<FollowData> findByFollowerId(@Param("followerId")Long followerId);
+
     @Query(value = "select follow " +
             "from FollowData follow " +
-            "where follow.followDeleteYn = 'N' " +
+            "where follow.deleted = false " +
             "and follow.followingId = :followingId")
     List<FollowData> findByFollowingId(@Param("followingId")Long followingId);
 

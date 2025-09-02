@@ -1,8 +1,8 @@
 package com.sorhive.comprojectserver.chatting.query;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 
-import jakarta.persistence.*;
 import java.sql.Timestamp;
 
 /**

@@ -3,13 +3,12 @@ package com.sorhive.comprojectserver.chatting.command.application.controller;
 import com.sorhive.comprojectserver.chatting.command.application.dto.ChattingCreateRequestDto;
 import com.sorhive.comprojectserver.chatting.infra.ChattingInfraService;
 import com.sorhive.comprojectserver.common.ResponseDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
 
 /**
  * <pre>
@@ -28,13 +27,10 @@ import jakarta.validation.Valid;
  */
 @RestController
 @RequestMapping("api/v1")
+@Slf4j
+@RequiredArgsConstructor
 public class ChattingController {
-    private static final Logger log = LoggerFactory.getLogger(ChattingController.class);
     private final ChattingInfraService chattingInfraService;
-
-    public ChattingController(ChattingInfraService chattingInfraService) {
-        this.chattingInfraService = chattingInfraService;
-    }
 
     /** 채팅 생성 */
     @PostMapping(value = "chatting")

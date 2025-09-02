@@ -21,5 +21,5 @@ import java.util.List;
  * @see (참고할 class 또는 외부 url)
  */
 public interface GuestBookDataDao extends Repository<GuestBookData, Long> {
-    List<GuestBookData> findByRoomIdAndGuestBookDeleteYnEquals(Long roomId, char n);
+    List<GuestBookData> findByRoomIdAndDeletedEquals(Long roomId, boolean deletedYn);
 }

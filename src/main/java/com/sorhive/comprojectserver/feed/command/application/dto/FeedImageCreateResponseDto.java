@@ -3,6 +3,7 @@ package com.sorhive.comprojectserver.feed.command.application.dto;
 import lombok.Getter;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * <pre>
@@ -26,10 +27,10 @@ public class FeedImageCreateResponseDto {
     private Timestamp uploadTime;
     private String feedImagePath;
 
-    public FeedImageCreateResponseDto(Long id, Timestamp uploadTime, String path) {
+    public FeedImageCreateResponseDto(Long id, LocalDateTime uploadTime, String path) {
 
         this.feedImageId = id;
-        this.uploadTime = uploadTime;
+        this.uploadTime = Timestamp.valueOf(uploadTime);
         this.feedImagePath = path;
 
     }

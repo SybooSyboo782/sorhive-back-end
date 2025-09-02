@@ -1,6 +1,6 @@
 package com.sorhive.comprojectserver.room.command.domain.repository;
 
-import com.sorhive.comprojectserver.room.command.domain.room.MongoRoom;
+import com.sorhive.comprojectserver.room.command.domain.model.room.MongoRoom;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 /**

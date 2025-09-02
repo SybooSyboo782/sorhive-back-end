@@ -4,7 +4,7 @@ import com.sorhive.comprojectserver.config.jwt.TokenProvider;
 import com.sorhive.comprojectserver.file.S3AvatarImageFile;
 import com.sorhive.comprojectserver.member.command.application.dto.AvatarImageDto;
 import com.sorhive.comprojectserver.member.command.application.dto.ResponseAvatarImageAiDto;
-import com.sorhive.comprojectserver.member.command.domain.model.avatarimage.AvatarImage;
+import com.sorhive.comprojectserver.member.command.domain.model.AvatarImage;
 import com.sorhive.comprojectserver.member.command.domain.repository.AvatarImageRepository;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;

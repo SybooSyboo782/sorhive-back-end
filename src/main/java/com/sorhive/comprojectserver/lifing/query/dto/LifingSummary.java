@@ -1,7 +1,7 @@
 package com.sorhive.comprojectserver.lifing.query.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifingvisit.LifingVisit;
+import com.sorhive.comprojectserver.lifing.command.domain.model.LifingVisit;
 import lombok.Getter;
 
 import java.sql.Timestamp;

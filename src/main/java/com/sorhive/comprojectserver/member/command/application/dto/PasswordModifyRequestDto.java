@@ -26,4 +26,5 @@ public class PasswordModifyRequestDto {
     
     @NonNull
     private String newPassword;
+
 }

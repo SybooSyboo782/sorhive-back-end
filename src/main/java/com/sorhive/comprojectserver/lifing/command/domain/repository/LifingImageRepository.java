@@ -1,8 +1,8 @@
 package com.sorhive.comprojectserver.lifing.command.domain.repository;
 
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifing.Lifing;
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifingimage.LifingImage;
-import org.springframework.data.repository.Repository;
+import com.sorhive.comprojectserver.lifing.command.domain.model.Lifing;
+import com.sorhive.comprojectserver.lifing.command.domain.model.LifingImage;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,8 +23,7 @@ import java.util.Optional;
  * @version 1(클래스 버전)
  * @see (참고할 class 또는 외부 url)
  */
-public interface LifingImageRepository extends Repository<LifingImage, Long> {
-    void save(LifingImage lifingImage);
+public interface LifingImageRepository extends JpaRepository<LifingImage, Long> {
     Optional<LifingImage> findById(Long memberCode);
     List<LifingImage> findByLifing(Lifing lifing);
 

@@ -7,13 +7,12 @@ import com.sorhive.comprojectserver.room.command.application.dto.GuestBookUpdate
 import com.sorhive.comprojectserver.room.command.application.dto.RoomCreateDto;
 import com.sorhive.comprojectserver.room.command.application.service.RoomService;
 import com.sorhive.comprojectserver.room.command.infra.RoomInfraService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
 
 /**
  * <pre>

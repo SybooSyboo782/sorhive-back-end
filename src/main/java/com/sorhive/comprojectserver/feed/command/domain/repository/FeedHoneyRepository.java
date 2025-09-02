@@ -1,9 +1,7 @@
 package com.sorhive.comprojectserver.feed.command.domain.repository;
 
-import com.sorhive.comprojectserver.feed.command.domain.model.feed.FeedId;
-import com.sorhive.comprojectserver.feed.command.domain.model.feedhoney.FeedHoney;
-import com.sorhive.comprojectserver.member.command.domain.model.member.MemberCode;
-import org.springframework.data.repository.Repository;
+import com.sorhive.comprojectserver.feed.command.domain.model.FeedHoney;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
@@ -23,9 +21,8 @@ import java.util.Optional;
  * @version 1(클래스 버전)
  * @see (참고할 class 또는 외부 url)
  */
-public interface FeedHoneyRepository extends Repository<FeedHoney, Long> {
+public interface FeedHoneyRepository extends JpaRepository<FeedHoney, Long> {
     
-    void save(FeedHoney feedHoney);
-    Optional<FeedHoney> findByMemberCodeAndFeedIdAndDeleteYnEquals(MemberCode memberCode, FeedId feedId, char n);
+    Optional<FeedHoney> findByMemberMemberCodeAndFeedFeedIdAndDeletedEquals(Long memberCode, Long feedId, boolean deletedYn);
 
 }

@@ -33,9 +33,9 @@
          where a.member_code = b.follower_id
            and b.following_id = #{memberCode}
            and not a.member_code = #{memberCode}
-           and a.member_delete_yn = 'N'
+           and a.deleted = false
            and a.member_role = 'ROLE_MEMBER'
-           and b.follow_delete_yn = 'N'
+           and b.deleted = false
     </select>
 
     <select id="findByFollowingId" resultMap="memberSummaryResultMap">
@@ -52,8 +52,8 @@
          where a.member_code = b.following_id
            and b.follower_id = #{memberCode}
            and not a.member_code = #{memberCode}
-           and a.member_delete_yn = 'N'
+           and a.deleted = false
            and a.member_role = 'ROLE_MEMBER'
-           and b.follow_delete_yn = 'N'
+           and b.deleted = false
     </select>
 </mapper>

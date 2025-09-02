@@ -1,12 +1,12 @@
 package com.sorhive.comprojectserver.lifing.query;
 
 import com.sorhive.comprojectserver.config.jwt.TokenProvider;
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifing.Lifing;
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifingvisit.LifingVisit;
+import com.sorhive.comprojectserver.lifing.command.application.exception.NoLifingException;
+import com.sorhive.comprojectserver.lifing.command.domain.model.Lifing;
+import com.sorhive.comprojectserver.lifing.command.domain.model.LifingVisit;
 import com.sorhive.comprojectserver.lifing.command.domain.repository.LifingRepository;
 import com.sorhive.comprojectserver.lifing.command.domain.repository.LifingVisitRepository;
 import com.sorhive.comprojectserver.lifing.query.dto.*;
-import com.sorhive.comprojectserver.member.command.domain.model.member.MemberCode;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,13 +75,13 @@ public class LifingQueryService {
         LifingSummary lifingSummary = lifingMapper.findOneByCreateTime(writerCode);
 
         /* 만약 조회하려는 라이핑 멤버 번호와 라이핑을 방문하는 멤버 번호가 다르다면  */
-        if(lifingSummary.getLifingWriterCode() != visitorCode) {
+        if (!lifingSummary.getLifingWriterCode().equals(visitorCode)) {
 
-            Lifing lifing = lifingRepository.findByLifingId(writerCode);
+            Lifing lifing = lifingRepository.findById(writerCode)
+                    .orElseThrow(() -> new NoLifingException("해당하는 라이핑이 없습니다."));
 
             /* 라이핑 조회 생성 */
             LifingVisit lifingVisit = new LifingVisit(
-                    new MemberCode(visitorCode),
                     lifing.getLifingWriter(),
                     lifing
             );
@@ -93,7 +93,7 @@ public class LifingQueryService {
         Long lifingId = lifingSummary.getLifingId();
 
         /* 라이핑에 댓글 있는지 확인 */
-        if(lifingMapper.selectAllLifingComments(lifingId) != null) {
+        if (lifingMapper.selectAllLifingComments(lifingId) != null) {
 
             List<LifingCommentData> lifingCommentDataList = lifingMapper.selectAllLifingComments(lifingId);
 
@@ -101,7 +101,7 @@ public class LifingQueryService {
         }
 
         /* 라이핑에 이미지가 있는지 확인 */
-        if(lifingMapper.selectLifingImage(lifingId) != null) {
+        if (lifingMapper.selectLifingImage(lifingId) != null) {
 
             LifingImagePath lifingImagePath = lifingMapper.selectLifingImage(lifingId);
 
