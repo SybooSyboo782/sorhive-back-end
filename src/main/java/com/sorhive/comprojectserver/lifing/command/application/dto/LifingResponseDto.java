@@ -1,9 +1,11 @@
 package com.sorhive.comprojectserver.lifing.command.application.dto;
 
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifing.LifingWriter;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * <pre>
@@ -22,6 +24,7 @@ import java.sql.Timestamp;
  * @see (참고할 class 또는 외부 url)
  */
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LifingResponseDto {
 
     private Long lifingId;
@@ -29,31 +32,36 @@ public class LifingResponseDto {
     private Long lifingNo;
     private Long lifingCategoryNo;
     private Timestamp lifingCreateTime;
-    private LifingWriter lifingWriter;
+    private Long memberCode;
+    private String lifingWriterName;
+    private String lifingWriterId;
     private String lifingImagePath;
 
-    protected LifingResponseDto() {}
-
-    public LifingResponseDto(Long lifingId, String lifingConetent, Long lifingNo, Long lifingCategoryNo, Timestamp createTime, LifingWriter lifingWriter, String lifingImagePath) {
+    public LifingResponseDto(Long lifingId, String lifingConetent, Long lifingNo, Long lifingCategoryNo, LocalDateTime createTime,
+                             Long memberCode, String lifingWriterName, String lifingWriterId, String lifingImagePath) {
 
         this.lifingId = lifingId;
         this.lifingContent = lifingConetent;
         this.lifingNo = lifingNo;
         this.lifingCategoryNo = lifingCategoryNo;
-        this.lifingCreateTime = createTime;
-        this.lifingWriter = lifingWriter;
+        this.lifingCreateTime = Timestamp.valueOf(createTime);
+        this.memberCode = memberCode;
+        this.lifingWriterName = lifingWriterName;
+        this.lifingWriterId = lifingWriterId;
         this.lifingImagePath = lifingImagePath;
 
     }
 
-    public LifingResponseDto(Long lifingId, String lifingConetent, Long lifingNo, Long lifingCategoryNo, Timestamp createTime, LifingWriter lifingWriter) {
+    public LifingResponseDto(Long lifingId, String lifingConetent, Long lifingNo, Long lifingCategoryNo, LocalDateTime createTime,
+                             Long memberCode, String lifingWriterName, String lifingWriterId) {
 
         this.lifingId = lifingId;
         this.lifingContent = lifingConetent;
         this.lifingNo = lifingNo;
         this.lifingCategoryNo = lifingCategoryNo;
-        this.lifingCreateTime = createTime;
-        this.lifingWriter = lifingWriter;
-
+        this.lifingCreateTime = Timestamp.valueOf(createTime);
+        this.memberCode = memberCode;
+        this.lifingWriterName = lifingWriterName;
+        this.lifingWriterId = lifingWriterId;
     }
 }

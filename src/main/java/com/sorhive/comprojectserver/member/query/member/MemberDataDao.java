@@ -1,9 +1,10 @@
 package com.sorhive.comprojectserver.member.query.member;
 
 import com.sorhive.comprojectserver.member.command.domain.model.member.MemberRole;
-import org.springframework.data.repository.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * <pre>
@@ -23,16 +24,17 @@ import java.util.List;
  * @author 부시연(최초 작성자)
  * @version 1(클래스 버전)
  */
-public interface MemberDataDao extends Repository<MemberData, String> {
+public interface MemberDataDao extends JpaRepository<MemberData, String> {
 
-    MemberData findByIdAndDeleteYnAndMemberRole(String memberId, char N, MemberRole role);
+    MemberData findByIdAndDeletedAndMemberRole(String memberId, boolean deletedYn, MemberRole role);
 
-    List<MemberData> findAllByMemberCodeIsNotAndDeleteYnAndMemberRole(Long memberCode, char N, MemberRole role);
+    List<MemberData> findAllByMemberCodeIsNotAndDeletedAndMemberRole(Long memberCode, boolean deletedYn, MemberRole role);
 
     List<MemberData> findByIdLikeAndMemberCodeIsNotAndMemberRole(String memberId, Long memberCode, MemberRole role);
 
-    MemberData findByMemberCodeAndMemberRole(Long memberCode, MemberRole role);
-    MemberData findFirstByMemberCodeAndDeleteYnAndMemberRole(Long memberCode, char N, MemberRole role);
+    Optional<MemberData> findByMemberCodeAndMemberRole(Long memberCode, MemberRole role);
+
+    MemberData findFirstByMemberCodeAndDeletedAndMemberRole(Long memberCode, boolean deletedYn, MemberRole role);
 
     MemberData findByMemberCodeAndMemberCodeIsNotAndMemberRole(Long memberCode, Long temp, MemberRole role);
 }

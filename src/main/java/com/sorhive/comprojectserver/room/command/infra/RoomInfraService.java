@@ -5,28 +5,25 @@ import com.sorhive.comprojectserver.common.exception.NotSameWriterException;
 import com.sorhive.comprojectserver.config.jwt.TokenProvider;
 import com.sorhive.comprojectserver.file.S3FurnitureImageFile;
 import com.sorhive.comprojectserver.file.S3MemberFile;
-import com.sorhive.comprojectserver.member.command.application.service.AuthService;
 import com.sorhive.comprojectserver.member.command.domain.model.member.Member;
-import com.sorhive.comprojectserver.member.command.domain.model.member.MemberCode;
 import com.sorhive.comprojectserver.member.command.domain.repository.MemberRepository;
+import com.sorhive.comprojectserver.member.command.exception.NoMemberException;
 import com.sorhive.comprojectserver.room.command.application.dto.FurnitureImageCreateRequestDto;
 import com.sorhive.comprojectserver.room.command.application.dto.FurnitureImageCreateResponseDto;
 import com.sorhive.comprojectserver.room.command.application.dto.RoomCreateDto;
-import com.sorhive.comprojectserver.room.command.domain.furnitureimage.FurnitureImage;
+import com.sorhive.comprojectserver.room.command.domain.model.FurnitureImage;
+import com.sorhive.comprojectserver.room.command.domain.model.room.MongoRoom;
+import com.sorhive.comprojectserver.room.command.domain.model.room.Room;
 import com.sorhive.comprojectserver.room.command.domain.repository.FurnitureImageRepository;
 import com.sorhive.comprojectserver.room.command.domain.repository.MongoRoomRepository;
 import com.sorhive.comprojectserver.room.command.domain.repository.RoomRepository;
-import com.sorhive.comprojectserver.room.command.domain.room.MongoRoom;
-import com.sorhive.comprojectserver.room.command.domain.room.Room;
-import com.sorhive.comprojectserver.room.command.domain.room.RoomCreator;
-import com.sorhive.comprojectserver.room.command.domain.room.RoomCreatorService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -47,29 +44,20 @@ import java.util.UUID;
  * @version 1(클래스 버전)
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
+@Transactional
 public class RoomInfraService {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
+    @Value( "${custom.default-mongoroom-code}")
+    private String defaultMongoRoomNo;
     private final MongoRoomRepository mongoRoomRepository;
     private final RoomRepository roomRepository;
-    private final RoomCreatorService roomCreatorService;
     private final MemberRepository memberRepository;
     private final FurnitureImageRepository furnitureImageRepository;
     private final TokenProvider tokenProvider;
     private final S3FurnitureImageFile s3FurnitureImageFile;
     private final S3MemberFile s3MemberFile;
-
-
-    public RoomInfraService(MongoRoomRepository mongoRoomRepository, RoomRepository roomRepository, RoomCreatorService roomCreatorService, MemberRepository memberRepository, FurnitureImageRepository furnitureImageRepository, TokenProvider tokenProvider, S3FurnitureImageFile s3FurnitureImageFile, S3MemberFile s3MemberFile) {
-        this.mongoRoomRepository = mongoRoomRepository;
-        this.roomRepository = roomRepository;
-        this.roomCreatorService = roomCreatorService;
-        this.memberRepository = memberRepository;
-        this.furnitureImageRepository = furnitureImageRepository;
-        this.tokenProvider = tokenProvider;
-        this.s3FurnitureImageFile = s3FurnitureImageFile;
-        this.s3MemberFile = s3MemberFile;
-    }
 
     /** 방 생성 */
     @Transactional
@@ -79,7 +67,7 @@ public class RoomInfraService {
 
         Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
 
-        if(roomCreateDto.getRoomImage() == null) {
+        if (roomCreateDto.getRoomImage() == null) {
             throw new NoContentException("방 이미지가 없습니다.");
         }
 
@@ -87,11 +75,10 @@ public class RoomInfraService {
         byte[] roomImage = roomCreateDto.getRoomImage();
 
         try {
-            if(roomImage != null) {
-
+            if (roomImage != null) {
                 /* 방이미지 S3에 저장하고 회원에 방 이미지 저장하기 */
-                Optional<Member> memberData = memberRepository.findByMemberCode(memberCode);
-                Member member = memberData.get();
+                Member member = memberRepository.findByMemberCode(memberCode)
+                        .orElseThrow(() -> new NoMemberException("Member not found with code: " + memberCode));
                 member.setRoomImagePath(s3MemberFile.upload(roomImage, "images", "room_" + memberCode + ".png"));
                 memberRepository.save(member);
             }
@@ -101,7 +88,8 @@ public class RoomInfraService {
         }
 
         /* 방작성자 생성 */
-        RoomCreator roomCreator = roomCreatorService.createRoomCreator(new MemberCode(memberCode));
+        Member roomCreator = memberRepository.findByMemberCode(memberCode)
+                .orElseThrow(() -> new NoMemberException("Member not found with code: " + memberCode));
 
         /* 몽고 DB 방 생성 */
         MongoRoom mongoRoom = new MongoRoom(
@@ -114,13 +102,16 @@ public class RoomInfraService {
 
         /* 기존 몽고 DB 방이 있으면 찾아서 삭제하기 */
         Room oldRoom = roomRepository.findById(memberCode);
-        if(oldRoom != null && oldRoom.getRoomNo() != "637befb055f63397c8692bb2") {
+        boolean isOldRoomValid = oldRoom != null
+                && !oldRoom.getRoomNo().equals(defaultMongoRoomNo);
+
+        if (isOldRoomValid) {
             mongoRoomRepository.deleteById(oldRoom.getRoomNo());
         }
 
         /* 방 생성하기 */
         Room newRoom = new Room(
-                roomCreator.getMemberCode().getValue(),
+                roomCreator.getMemberCode(),
                 mongoRoom.getId(),
                 roomCreator
         );
@@ -142,11 +133,13 @@ public class RoomInfraService {
 
         Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
 
-        if(furnitureImageCreateRequestDto.getRoomId() != memberCode) {
+        boolean isNotRoomOwner = !memberCode.equals(furnitureImageCreateRequestDto.getRoomId());
+
+        if (isNotRoomOwner) {
             throw new NotSameWriterException("해당 사람은 방 주인이 아닙니다.");
         }
 
-        if((furnitureImageCreateRequestDto.getFurnitureImage() == null)||(furnitureImageCreateRequestDto.getFurnitureImageNo() == null)||(furnitureImageCreateRequestDto.getFurnitureImageName() == null) ) {
+        if (isInvalidFurnitureImageRequest(furnitureImageCreateRequestDto) ) {
             throw new NoContentException("이미지 정보값이 없습니다.");
         }
 
@@ -189,6 +182,12 @@ public class RoomInfraService {
             throw new RuntimeException(e);
         }
 
+    }
+
+    private boolean isInvalidFurnitureImageRequest(FurnitureImageCreateRequestDto dto) {
+        return dto.getFurnitureImage() == null
+                || dto.getFurnitureImageNo() == null
+                || dto.getFurnitureImageName() == null;
     }
 
 }

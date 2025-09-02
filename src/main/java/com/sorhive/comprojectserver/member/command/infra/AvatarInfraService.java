@@ -4,17 +4,16 @@ import com.sorhive.comprojectserver.common.exception.NoContentException;
 import com.sorhive.comprojectserver.config.jwt.TokenProvider;
 import com.sorhive.comprojectserver.file.S3MemberFile;
 import com.sorhive.comprojectserver.member.command.application.dto.AvatarRequestDto;
-import com.sorhive.comprojectserver.member.command.domain.model.avatar.Avatar;
+import com.sorhive.comprojectserver.member.command.domain.model.Avatar;
 import com.sorhive.comprojectserver.member.command.domain.model.member.Member;
-import com.sorhive.comprojectserver.member.command.domain.model.member.MemberCode;
 import com.sorhive.comprojectserver.member.command.domain.repository.AvatarRepository;
 import com.sorhive.comprojectserver.member.command.domain.repository.MemberRepository;
+import com.sorhive.comprojectserver.member.command.exception.NoMemberException;
+import com.sorhive.comprojectserver.room.command.domain.model.room.Room;
 import com.sorhive.comprojectserver.room.command.domain.repository.RoomRepository;
-import com.sorhive.comprojectserver.room.command.domain.room.Room;
-import com.sorhive.comprojectserver.room.command.domain.room.RoomCreator;
-import com.sorhive.comprojectserver.room.command.domain.room.RoomCreatorService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,24 +37,18 @@ import java.util.Optional;
  * @version 1(클래스 버전)
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AvatarInfraService {
 
-    private static final Logger log = LoggerFactory.getLogger(AvatarInfraService.class);
+    @Value( "${custom.default-room-code}")
+    private String defaultRoomNo;
     private final AvatarRepository avatarRepository;
     private final TokenProvider tokenProvider;
-    private final RoomCreatorService roomCreatorService;
     private final RoomRepository roomRepository;
     private final MemberRepository memberRepository;
     private S3MemberFile s3MemberFile;
-
-    public AvatarInfraService(AvatarRepository avatarRepository, TokenProvider tokenProvider, RoomCreatorService roomCreatorService, RoomRepository roomRepository, MemberRepository memberRepository, S3MemberFile s3MemberFile) {
-        this.avatarRepository = avatarRepository;
-        this.tokenProvider = tokenProvider;
-        this.roomCreatorService = roomCreatorService;
-        this.roomRepository = roomRepository;
-        this.memberRepository = memberRepository;
-        this.s3MemberFile = s3MemberFile;
-    }
 
     /** 아바타 생성하기 */
     @Transactional
@@ -68,16 +61,17 @@ public class AvatarInfraService {
 
         String memberAvatarImageName = "avatar_" + memberCode + ".png";
 
-        if(avatarRequestDto.getMemberAvatarImage() == null) {
+        if (avatarRequestDto.getMemberAvatarImage() == null) {
             throw new NoContentException("아바타 이미지가 없습니다.");
         }
 
         byte[] avatarImage = avatarRequestDto.getMemberAvatarImage();
 
+        Member member = memberRepository.findByMemberCode(memberCode)
+                .orElseThrow(() -> new NoMemberException("Member not found with code: " + memberCode));
+
         try {
-            if(avatarImage != null) {
-                Optional<Member> memberData = memberRepository.findByMemberCode(memberCode);
-                Member member = memberData.get();
+            if (avatarImage != null) {
                 member.createAvatarImagePath(s3MemberFile.upload(avatarImage, "images", memberAvatarImageName));
                 memberRepository.save(member);
             }
@@ -96,12 +90,10 @@ public class AvatarInfraService {
         avatarRepository.save(avatar);
 
         /** 기본방 설정 */
-        RoomCreator roomCreator = roomCreatorService.createRoomCreator(new MemberCode(memberCode));
-
         Room defaultRoom = new Room(
                 memberCode,
-                "637c67b716de470e1cecef26",
-                roomCreator
+                defaultRoomNo,
+                member
         );
 
         /* 방에 몽고 DB의 기본 방 값을 포함하여 저장하기 */
@@ -121,14 +113,14 @@ public class AvatarInfraService {
 
         String memberAvatarImageName = "avatar_" + memberCode + ".png";
 
-        if(avatarRequestDto.getMemberAvatarImage() == null) {
+        if (avatarRequestDto.getMemberAvatarImage() == null) {
             throw new NoContentException("아바타 이미지가 없습니다.");
         }
 
         byte[] avatarImage = avatarRequestDto.getMemberAvatarImage();
 
         try {
-            if(avatarImage != null) {
+            if (avatarImage != null) {
                 Optional<Member> memberData = memberRepository.findByMemberCode(memberCode);
                 Member member = memberData.get();
                 member.setAvatarImagePath(s3MemberFile.upload(avatarImage, "images", memberAvatarImageName));

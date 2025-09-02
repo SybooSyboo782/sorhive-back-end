@@ -1,10 +1,11 @@
 package com.sorhive.comprojectserver.lifing.command.domain.repository;
 
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifing.Lifing;
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifingcomment.LifingComment;
-import org.springframework.data.repository.Repository;
+import com.sorhive.comprojectserver.lifing.command.domain.model.Lifing;
+import com.sorhive.comprojectserver.lifing.command.domain.model.LifingComment;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * <pre>
@@ -23,10 +24,9 @@ import java.util.List;
  * @version 1(클래스 버전)
  * @see (참고할 class 또는 외부 url)
  */
-public interface LifingCommentRepository extends Repository<LifingComment, Long> {
+public interface LifingCommentRepository extends JpaRepository<LifingComment, Long> {
 
-    void save(LifingComment lifingComment);
     LifingComment findByLifingCommentId(Long lifingCommentId);
-    LifingComment findByLifingCommentIdAndLifingCommentDeleteYnEquals(Long lifingCommentId, char n);
+    Optional<LifingComment> findByLifingCommentIdAndDeletedEquals(Long lifingCommentId, boolean deletedYn);
     List<LifingComment> findByLifing(Lifing lifing);
 }

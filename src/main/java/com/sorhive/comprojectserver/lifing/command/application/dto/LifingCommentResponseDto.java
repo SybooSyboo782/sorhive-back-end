@@ -3,6 +3,7 @@ package com.sorhive.comprojectserver.lifing.command.application.dto;
 import lombok.Getter;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * <pre>
@@ -28,11 +29,11 @@ public class LifingCommentResponseDto {
 
     protected LifingCommentResponseDto() {}
 
-    public LifingCommentResponseDto(Long lifingCommentId, String lifingCommentContent, Timestamp lifingCommentCreateTime) {
+    public LifingCommentResponseDto(Long lifingCommentId, String lifingCommentContent, LocalDateTime lifingCommentCreateTime) {
 
         this.lifingCommentId = lifingCommentId;
         this.lifingCommentcontent = lifingCommentContent;
-        this.lifingCommentCreateTime = lifingCommentCreateTime;
+        this.lifingCommentCreateTime = Timestamp.valueOf(lifingCommentCreateTime);
 
     }
 

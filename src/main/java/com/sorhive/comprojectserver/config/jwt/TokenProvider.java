@@ -68,7 +68,7 @@ public class TokenProvider {
 
         Claims claims = Jwts
                 .claims()
-                .setSubject(String.valueOf(member.getMemberId().getId()))
+                .setSubject(String.valueOf(member.getMemberId()))
                 .setId(String.valueOf(member.getMemberCode()));
         claims.put(AUTHORITIES_KEY, role);
 

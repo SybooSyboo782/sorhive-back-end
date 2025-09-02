@@ -1,9 +1,7 @@
 package com.sorhive.comprojectserver.member.command.domain.repository;
 
-import com.sorhive.comprojectserver.member.command.domain.model.avatarimage.AvatarImage;
-import org.springframework.data.repository.Repository;
-
-import java.util.Optional;
+import com.sorhive.comprojectserver.member.command.domain.model.AvatarImage;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * <pre>
@@ -19,9 +17,5 @@ import java.util.Optional;
  * @author 부시연(최초 작성자)
  * @version 1(클래스 버전)
  */
-public interface AvatarImageRepository extends Repository<AvatarImage, Long> {
-
-    Optional<AvatarImage> findById(Long id);
-    void save(AvatarImage avatarImage);
-
+public interface AvatarImageRepository extends JpaRepository<AvatarImage, Long> {
 }

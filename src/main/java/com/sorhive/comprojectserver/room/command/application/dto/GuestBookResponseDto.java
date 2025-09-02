@@ -1,9 +1,8 @@
 package com.sorhive.comprojectserver.room.command.application.dto;
 
 import lombok.Getter;
-import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * <pre>
@@ -22,7 +21,6 @@ import java.util.Date;
  * @see (참고할 class 또는 외부 url)
  */
 @Getter
-@Setter
 public class GuestBookResponseDto {
 
     private Long guestBookId;
@@ -31,6 +29,15 @@ public class GuestBookResponseDto {
     private String guestBookWriterId;
     private String guestBookWriterName;
     private Long roomId;
-    private Date createTime;
+    private LocalDateTime createTime;
 
+    public GuestBookResponseDto(Long guestBookId, String guestBookContent, Long guestBookWriterCode, String guestBookWriterId, String guestBookWriterName, Long roomId, LocalDateTime createTime) {
+        this.guestBookId = guestBookId;
+        this.guestBookContent = guestBookContent;
+        this.guestBookWriterCode = guestBookWriterCode;
+        this.guestBookWriterId = guestBookWriterId;
+        this.guestBookWriterName = guestBookWriterName;
+        this.roomId = roomId;
+        this.createTime = createTime;
+    }
 }

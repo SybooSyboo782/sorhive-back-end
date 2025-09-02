@@ -1,35 +1,25 @@
 package com.sorhive.comprojectserver.lifing.command.application.service;
 
 import com.sorhive.comprojectserver.common.exception.AlreadyDeleteException;
-import com.sorhive.comprojectserver.common.exception.NoContentException;
 import com.sorhive.comprojectserver.common.exception.NotSameWriterException;
 import com.sorhive.comprojectserver.config.jwt.TokenProvider;
 import com.sorhive.comprojectserver.lifing.command.application.dto.*;
 import com.sorhive.comprojectserver.lifing.command.application.exception.AlreadyHoneyException;
 import com.sorhive.comprojectserver.lifing.command.application.exception.NoLifingException;
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifing.Lifing;
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifing.LifingId;
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifing.LifingWriter;
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifing.LifingWriterService;
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifingcomment.LifingComment;
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifingcomment.LifingCommentWriter;
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifingcomment.LifingCommentWriterService;
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifinghoney.LifingHoney;
+import com.sorhive.comprojectserver.lifing.command.domain.model.Lifing;
+import com.sorhive.comprojectserver.lifing.command.domain.model.LifingComment;
+import com.sorhive.comprojectserver.lifing.command.domain.model.LifingHoney;
 import com.sorhive.comprojectserver.lifing.command.domain.repository.LifingCommentRepository;
 import com.sorhive.comprojectserver.lifing.command.domain.repository.LifingHoneyRepository;
 import com.sorhive.comprojectserver.lifing.command.domain.repository.LifingRepository;
-import com.sorhive.comprojectserver.lifing.command.infra.NoLifingNoException;
 import com.sorhive.comprojectserver.lifing.exception.NoLifingCommentException;
-import com.sorhive.comprojectserver.lifing.query.LifingMapper;
 import com.sorhive.comprojectserver.member.command.domain.model.member.Member;
-import com.sorhive.comprojectserver.member.command.domain.model.member.MemberCode;
 import com.sorhive.comprojectserver.member.command.domain.repository.MemberRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.sorhive.comprojectserver.member.command.exception.NoMemberException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 /**
  * <pre>
@@ -51,35 +41,18 @@ import java.util.Optional;
  *
  * @author 부시연(최초 작성자)
  * @version 1(클래스 버전)
- * @see (참고할 class 또는 외부 url)
  */
 @Service
+@RequiredArgsConstructor
+@Slf4j
+@Transactional(readOnly = true)
 public class LifingService {
 
-    private static final Logger log = LoggerFactory.getLogger(LifingService.class);
     private final LifingRepository lifingRepository;
-
-    private final LifingWriterService lifingWriterService;
     private final TokenProvider tokenProvider;
-    private final LifingMapper lifingMapper;
     private final MemberRepository memberRepository;
     private final LifingHoneyRepository lifingHoneyRepository;
-    private final LifingCommentWriterService lifingCommentWriterService;
     private final LifingCommentRepository lifingCommentRepository;
-
-    public LifingService(LifingRepository lifingRepository, LifingWriterService lifingWriterService, TokenProvider tokenProvider, LifingMapper lifingMapper, MemberRepository memberRepository, LifingHoneyRepository lifingHoneyRepository, LifingCommentWriterService lifingCommentWriterService, LifingCommentRepository lifingCommentRepository) {
-
-        this.lifingRepository = lifingRepository;
-        this.lifingWriterService = lifingWriterService;
-        this.tokenProvider = tokenProvider;
-        this.lifingMapper = lifingMapper;
-        this.memberRepository = memberRepository;
-        this.lifingHoneyRepository = lifingHoneyRepository;
-
-        this.lifingCommentWriterService = lifingCommentWriterService;
-        this.lifingCommentRepository = lifingCommentRepository;
-    }
-
 
     /** 라이핑 생성하기 */
     public LifingResponseDto createLifing(String accessToken, LifingCreateDto lifingCreateDto) {
@@ -90,67 +63,38 @@ public class LifingService {
         /* 토큰에서 멤버 코드 값 꺼내오기 */
         Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
 
-        /* 라이핑 내용 없을 경우 예외처리 */
-        if(lifingCreateDto.getLifingContent() == null) {
-            throw new NoContentException("라이핑에 내용이 없습니다.");
-        }
-
-        /* 라이핑 번호가 없을 경우 예외처리 */
-        if(lifingCreateDto.getLifingNo() == null) {
-            throw new NoLifingNoException("라이핑 번호가 없습니다.");
-        }
-        
-        /* 라이핑 아이디가 없을 경우 예외처리 */
-        if(lifingCreateDto.getLifingId() == null) {
-            throw new NoLifingNoException("라이핑 아이디가 없습니다.");
-        }
-
-        /* 라이핑 카테고리 번호가 없을 경우 예외처리 */
-        if(lifingCreateDto.getLifingCategoryNo() == null) {
-            throw new NoLifingNoException("라이핑 카테고리 번호가 없습니다.");
-        }
-
-        /* 라이핑 작성자 만들기 */
-        LifingWriter lifingWriter = lifingWriterService.createLifingWriter(new MemberCode(memberCode));
-
-        Long lifingNo = lifingCreateDto.getLifingNo();
-        Long lifingCategoryNo = lifingCreateDto.getLifingCategoryNo();
-        String lifingConetent = lifingCreateDto.getLifingContent();
-
-        Optional<Lifing> lifingData = lifingRepository.findByLifingIdAndDeleteYnEquals(lifingCreateDto.getLifingId(), 'N');
-
-        Lifing lifing = lifingData.get();
+        /* 라이핑 작성자 찾기 */
+        Member lifingWriter = memberRepository.findByMemberCode(memberCode)
+                .orElseThrow(() -> new NoMemberException("해당 회원이 없습니다."));
 
         /* 라이핑 생성하기 */
-        lifing.createNewAiLifing(
+        Lifing lifing = new Lifing(
                 lifingWriter,
-                lifingNo,
-                lifingCategoryNo,
-                lifingConetent
+                lifingCreateDto.getLifingNo(),
+                lifingCreateDto.getLifingCategoryNo(),
+                lifingCreateDto.getLifingContent()
         );
 
         /* 라이핑 저장하기 */
         lifingRepository.save(lifing);
 
         /* 라이핑 번호를 저장하기 위해 멤버 데이터 조회하기 */
-        Optional<Member> memberData = memberRepository.findByMemberCode(memberCode);
-        Member member = memberData.get();
-        member.changeLifingWithAI(lifingNo, lifingCategoryNo);
+        lifingWriter.changeLifingWithAI(lifingCreateDto.getLifingNo(), lifingCreateDto.getLifingCategoryNo());
 
         /* 멤버에 라이핑번호 정보 저장하기 */
-        memberRepository.save(member);
+        memberRepository.save(lifingWriter);
 
-        /* 라이핑 생성 반환 전송 객체 만들기 */
-        LifingResponseDto lifingResponseDto = new LifingResponseDto(
+        /* 라이핑 생성 전송 객체 반환하기 */
+        return new LifingResponseDto(
                 lifing.getLifingId(),
                 lifing.getLifingConetent(),
                 lifing.getLifingNo(),
                 lifing.getLifingCategoryNo(),
-                lifing.getCreateTime(),
-                lifing.getLifingWriter()
+                lifing.getCreatedDate(),
+                lifing.getLifingWriter().getMemberCode(),
+                lifing.getLifingWriter().getMemberName(),
+                lifing.getLifingWriter().getMemberId()
         );
-
-        return lifingResponseDto;
     }
 
 
@@ -163,36 +107,32 @@ public class LifingService {
 
         Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
 
-        if(lifingRepository.findByLifingId(lifingId) == null) {
-            throw new NoLifingException("해당 라이핑이 존재하지 않습니다.");
-        }
+        Member member = memberRepository.findByMemberCode(memberCode)
+                .orElseThrow(() -> new NoMemberException("해당하는 회원이 없습니다."));
+        
+        Lifing lifing = lifingRepository.findByLifingIdAndDeletedEquals(lifingId, false)
+                .orElseThrow(() -> new NoLifingException("해당하는 라이핑이 없습니다."));
 
-        Optional<Lifing> lifingData = lifingRepository.findByLifingIdAndDeleteYnEquals(lifingId, 'N');
-
-        if(!lifingHoneyRepository.findByMemberCodeAndLifingIdAndDeleteYnEquals(new MemberCode(memberCode), new LifingId(lifingId), 'N').isEmpty() ) {
+        if (!lifingHoneyRepository.findByMemberMemberCodeAndLifingLifingIdAndDeletedEquals(memberCode, lifingId, false).isEmpty() ) {
             throw new AlreadyHoneyException("이미 허니를 했습니다.");
         }
 
-        Lifing lifing = lifingData.get();
         lifing.countingHoney(1);
         lifingRepository.save(lifing);
 
         LifingHoney lifingHoney = new LifingHoney(
-                new MemberCode(memberCode),
-                new LifingId(lifingId)
+                member,
+                lifing
         );
 
         lifingHoneyRepository.save(lifingHoney);
 
-        LifingHoneyCreateResponseDto lifingHoneyCreateResponseDto = new LifingHoneyCreateResponseDto(
+        return new LifingHoneyCreateResponseDto(
                 lifingHoney.getId(),
-                lifingHoney.getMemberCode().getValue(),
-                lifingHoney.getLifingId().getValue(),
-                lifingHoney.getCreateTime()
+                lifingHoney.getMember().getMemberCode(),
+                lifingHoney.getLifing().getLifingId(),
+                lifingHoney.getCreatedDate()
         );
-
-        return lifingHoneyCreateResponseDto;
-
     }
 
     /** 허니 취소 */
@@ -204,34 +144,25 @@ public class LifingService {
 
         Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
 
-        if(lifingRepository.findByLifingId(lifingId) == null) {
-            throw new NoLifingException("해당 라이핑이 존재하지 않습니다.");
-        }
 
-        Optional<Lifing> lifingData = lifingRepository.findByLifingIdAndDeleteYnEquals(lifingId, 'N');
+        Lifing lifing = lifingRepository.findByLifingIdAndDeletedEquals(lifingId, false)
+                .orElseThrow(() -> new NoLifingException("해당 라이핑이 존재하지 않습니다."));
 
-        Lifing lifing = lifingData.get();
         lifing.countingHoney(-1);
         lifingRepository.save(lifing);
 
-        if(lifingHoneyRepository.findByMemberCodeAndLifingIdAndDeleteYnEquals(new MemberCode(memberCode), new LifingId(lifingId), 'N').isEmpty()) {
-            throw new AlreadyDeleteException("이미 허니가 취소 되었습니다.");
-        }
+        LifingHoney lifingHoney = lifingHoneyRepository.findByMemberMemberCodeAndLifingLifingIdAndDeletedEquals(memberCode, lifingId, false)
+                .orElseThrow(() -> new AlreadyDeleteException("이미 허니가 취소 되었습니다."));
 
-        Optional<LifingHoney> honeyData = lifingHoneyRepository.findByMemberCodeAndLifingIdAndDeleteYnEquals(new MemberCode(memberCode), new LifingId(lifingId), 'N');
-
-        LifingHoney lifingHoney = honeyData.get();
-        lifingHoney.setDeleteYn('Y');
+        lifingHoney.softDelete();
         lifingHoneyRepository.save(lifingHoney);
 
-        LifingHoneyDeleteResponseDto lifingHoneyDeleteResponseDto = new LifingHoneyDeleteResponseDto(
+        return new LifingHoneyDeleteResponseDto(
                 lifingHoney.getId(),
-                lifingHoney.getLifingId().getValue(),
-                lifingHoney.getMemberCode().getValue(),
-                lifingHoney.getDeleteTime()
+                lifingHoney.getLifing().getLifingId(),
+                lifingHoney.getMember().getMemberCode(),
+                lifingHoney.getDeletedAt()
         );
-
-        return lifingHoneyDeleteResponseDto;
 
     }
 
@@ -244,15 +175,13 @@ public class LifingService {
 
         Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
 
-        LifingCommentWriter lifingCommentWriter = lifingCommentWriterService.createLifingCommentWriter(new MemberCode(memberCode));
+        Member lifingCommentWriter = memberRepository.findByMemberCode(memberCode)
+                        .orElseThrow(() -> new NoMemberException("해당하는 회원이 없습니다. " + memberCode));
 
         String lifingCommentContent = lifingCommentCreateDto.getLifingCommentContent();
 
-        Lifing lifing = lifingRepository.findByLifingId(lifingId);
-
-        if(lifing == null) {
-            throw new NoLifingException("해당 라이핑이 존재하지 않습니다.");
-        }
+        Lifing lifing = lifingRepository.findById(lifingId)
+                .orElseThrow(() -> new NoLifingException("해당 라이핑이 존재하지 않습니다."));
 
         LifingComment lifingComment = new LifingComment(
                 lifingCommentWriter,
@@ -262,13 +191,11 @@ public class LifingService {
 
         lifingCommentRepository.save(lifingComment);
 
-        LifingCommentResponseDto lifingCommentResponseDto = new LifingCommentResponseDto(
+        return new LifingCommentResponseDto(
                 lifingComment.getLifingCommentId(),
                 lifingComment.getLifingCommentContent(),
-                lifingComment.getLifingCommentCreateTime()
+                lifingComment.getCreatedDate()
         );
-
-        return lifingCommentResponseDto;
 
     }
 
@@ -280,26 +207,13 @@ public class LifingService {
 
         Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
 
-        if(lifingCommentRepository.findByLifingCommentId(lifingCommentId) == null) {
-            throw new NoLifingCommentException("해당 댓글은 존재 하지 않습니다");
-        }
+        // 삭제 되지 않은 댓글만 조회
+        LifingComment lifingComment = getCommentIfWriterMatches(lifingCommentId, memberCode);
 
-        if(lifingCommentRepository.findByLifingCommentIdAndLifingCommentDeleteYnEquals(lifingCommentId, 'Y') != null) {
-            throw new NoLifingCommentException("해당 댓글은 이미 삭제가 되었습니다.");
-        }
-
-        Optional<LifingComment> lifingCommentData = Optional.ofNullable(lifingCommentRepository.findByLifingCommentIdAndLifingCommentDeleteYnEquals(lifingCommentId, 'N'));
-        LifingComment lifingComment = lifingCommentData.get() ;
-
-        if(lifingComment.getLifingCommentWriter().getLifingCommentWriterCode().getValue() != memberCode) {
-            throw new NotSameWriterException("해당 댓글 작성자와 요청자가 다릅니다.");
-        }
-
-        lifingComment.deleteComment('Y');
+        lifingComment.softDelete();
         lifingCommentRepository.save(lifingComment);
 
         return lifingComment.getLifingCommentId();
-
     }
 
     /** 라이핑 댓글 수정 */
@@ -309,41 +223,36 @@ public class LifingService {
         log.info("[LifingService] lifingCommentUpdateDto : " + lifingCommentUpdateRequestDto);
 
         Long memberCode = Long.valueOf(tokenProvider.getUserCode(accessToken));
-
-        if((lifingCommentUpdateRequestDto.getLifingCommentId() == null) || (lifingCommentUpdateRequestDto.getLifingCommentContent() == null)) {
-            throw new NoContentException("해당 댓글 수정에 필요한 내용이 없습니다.");
-        }
-
         String lifingCommentContent = lifingCommentUpdateRequestDto.getLifingCommentContent();
         Long lifingCommentId = lifingCommentUpdateRequestDto.getLifingCommentId();
 
-        if(lifingCommentRepository.findByLifingCommentId(lifingCommentId) == null) {
-            throw new NoLifingCommentException("해당 댓글은 존재 하지 않습니다");
-        }
-
-        if(lifingCommentRepository.findByLifingCommentIdAndLifingCommentDeleteYnEquals(lifingCommentId, 'Y') != null) {
-            throw new NoLifingCommentException("해당 댓글은 이미 삭제가 되었습니다.");
-        }
-
-        Optional<LifingComment> lifingCommentData = Optional.ofNullable(lifingCommentRepository.findByLifingCommentIdAndLifingCommentDeleteYnEquals(lifingCommentId, 'N'));
-        LifingComment lifingComment = lifingCommentData.get() ;
-
-        if(lifingComment.getLifingCommentWriter().getLifingCommentWriterCode().getValue() != memberCode) {
-            throw new NotSameWriterException("해당 댓글 작성자와 요청자가 다릅니다.");
-        }
+        LifingComment lifingComment = getCommentIfWriterMatches(lifingCommentId, memberCode);
 
         lifingComment.updateComment(lifingCommentContent);
         lifingCommentRepository.save(lifingComment);
 
         /* 라이핑 댓글 수정 응답 전송객체에 값을 답아서 반환한다. */
-        LifingCommentUpdateResponseDto lifingCommentUpdateResponseDto = new LifingCommentUpdateResponseDto(
+        return new LifingCommentUpdateResponseDto(
                 lifingComment.getLifingCommentId(),
                 lifingComment.getLifingCommentContent(),
-                lifingComment.getLifingCommentWriter(),
-                lifingComment.getLifingCommentUploadTime()
+                lifingComment.getLifingCommentWriter().getMemberCode(),
+                lifingComment.getLifingCommentWriter().getMemberName(),
+                lifingComment.getLifingCommentWriter().getMemberId(),
+                lifingComment.getUpdateDate()
         );
+    }
 
-        return lifingCommentUpdateResponseDto;
+    private LifingComment getCommentIfWriterMatches(Long lifingCommentId, Long memberCode) {
+        // 삭제 되지 않은 댓글만 조회
+        LifingComment lifingComment = lifingCommentRepository
+                .findByLifingCommentIdAndDeletedEquals(lifingCommentId, false)
+                .orElseThrow(() -> new NoLifingCommentException("해당 댓글은 존재하지 않거나 이미 삭제되었습니다."));
 
+        // 작성자 검증
+        if (!lifingComment.getLifingCommentWriter().getMemberCode()
+                .equals(memberCode)) {
+            throw new NotSameWriterException("해당 댓글 작성자와 요청자가 다릅니다.");
+        }
+        return lifingComment;
     }
 }

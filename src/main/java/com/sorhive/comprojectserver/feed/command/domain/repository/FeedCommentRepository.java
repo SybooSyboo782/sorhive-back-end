@@ -1,8 +1,9 @@
 package com.sorhive.comprojectserver.feed.command.domain.repository;
 
-import com.sorhive.comprojectserver.feed.command.domain.model.feed.Feed;
-import com.sorhive.comprojectserver.feed.command.domain.model.feedcomment.FeedComment;
-import org.springframework.data.repository.Repository;
+import com.sorhive.comprojectserver.feed.command.domain.model.Feed;
+import com.sorhive.comprojectserver.feed.command.domain.model.FeedComment;
+import com.sorhive.comprojectserver.member.command.domain.model.member.Member;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,13 +25,11 @@ import java.util.Optional;
  * @version 1(클래스 버전)
  * @see (참고할 class 또는 외부 url)
  */
-public interface FeedCommentRepository extends Repository<FeedComment, Long> {
+public interface FeedCommentRepository extends JpaRepository<FeedComment, Long> {
 
-    void save(FeedComment feedComment);
+    FeedComment findById(Member feedCommentId);
 
-    FeedComment findById(Long feedCommentId);
-
-    Optional<FeedComment> findByIdAndDeleteYnEquals(Long feedCommentId, char n);
+    Optional<FeedComment> findByIdAndDeletedEquals(Long feedCommentId, boolean deleteYn);
 
     List<FeedComment> findByFeed(Feed feed);
 }

@@ -1,9 +1,9 @@
 package com.sorhive.comprojectserver.member.command.application.dto;
 
-import com.sorhive.comprojectserver.member.command.domain.model.member.MemberId;
 import lombok.Getter;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * <pre>
@@ -24,14 +24,16 @@ import java.sql.Timestamp;
 public class MemberModifyResponseDto {
 
     private Long memberCode;
-    private MemberId memberId;
+    private String memberId;
     private String memberName;
     private Timestamp uploadTime;
+
     protected MemberModifyResponseDto () {}
-    public MemberModifyResponseDto(Long memberCode, MemberId memberId, String memberName, Timestamp uploadTime) {
+
+    public MemberModifyResponseDto(Long memberCode, String memberId, String memberName, LocalDateTime uploadTime) {
         this.memberCode = memberCode;
         this.memberId = memberId;
         this.memberName = memberName;
-        this.uploadTime = uploadTime;
+        this.uploadTime = Timestamp.valueOf(uploadTime);
     }
 }

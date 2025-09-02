@@ -88,7 +88,7 @@ public class RecommendInfraQueryService {
         List<Integer> tempList2 = new ArrayList<>();
 
         /* 팔로우 하고 있는 목록이 있다면 */
-        if(!tempMemberSummaryList.isEmpty()) {
+        if (!tempMemberSummaryList.isEmpty()) {
 
             for (int i = 0; i < tempMemberSummaryList.size(); i++) {
 
@@ -123,10 +123,10 @@ public class RecommendInfraQueryService {
                 for (int j = 0; j < tempMemberSummaryList.size(); j++) {
 
                     /* 만약 임시 리스트2의 값과 임시회원요약리스트의 회원코드가 같다면 */
-                    if(tempList2.get(i) == tempMemberSummaryList.get(j).getMemberCode().intValue()) {
+                    if (tempList2.get(i) == tempMemberSummaryList.get(j).getMemberCode().intValue()) {
 
                         /* 라이핑 YN의 여부에 따라서 따로 임시 저장하기 */
-                        if(tempMemberSummaryList.get(j).getLifingYn().equals("'Y'")) {
+                        if (tempMemberSummaryList.get(j).getLifingYn().equals("'Y'")) {
                             tempLifingMemberSummaryList.add(tempMemberSummaryList.get(j));
                         } else {
                             tempLifingMemberSummaryList2.add(tempMemberSummaryList.get(j));
@@ -169,7 +169,7 @@ public class RecommendInfraQueryService {
 
         for (int i = 0; i < mongoRecommend.getMemberCodes().size(); i++) {
 
-            if(mongoRecommend.getMemberCodes().get(i).equals(memberCode.toString())) {
+            if (mongoRecommend.getMemberCodes().get(i).equals(memberCode.toString())) {
 
                 guestCodes = mongoRecommend.getGuestCodes().get(i);
 
@@ -202,12 +202,8 @@ public class RecommendInfraQueryService {
         List<Integer> tempList2 = new ArrayList<>();
 
         /* 회원번호로 조회하기 */
-        MemberData followerMemberData = memberDataDao.findByMemberCodeAndMemberRole(roomId, MemberRole.valueOf("ROLE_MEMBER"));
-
-        if(followerMemberData == null) {
-            throw new NoMemberException("회원 정보가 없습니다");
-        }
-
+        MemberData followerMemberData = memberDataDao.findByMemberCodeAndMemberRole(roomId, MemberRole.ROLE_MEMBER)
+                .orElseThrow(() -> new NoMemberException("해당하는 회원이 없습니다."));
 
         /* 회원 번호의 손님들의 추천리스트 가져오기 */
         List<String> recommendList = findGuestList(roomId);
@@ -221,7 +217,7 @@ public class RecommendInfraQueryService {
         followerCount = followerMemberDataList.size();
 
         /* 팔로워의 팔로잉 목록이 있다면 하나씩 꺼내서 tempMemberDataList에 넣어준다. */
-        if(followerMemberDataList != null ){
+        if (followerMemberDataList != null ){
 
             for (int i = 0; i < followerCount; i++) {
 
@@ -248,7 +244,7 @@ public class RecommendInfraQueryService {
                     for (int k = 0; k < followerMemberDataList.size(); k++) {
 
                         /* 만약 임시 리스트2의 값과 임시회원요약리스트의 회원코드가 같다면 */
-                        if(tempList2.get(j) == followerMemberDataList.get(k).getMemberCode().intValue()) {
+                        if (tempList2.get(j) == followerMemberDataList.get(k).getMemberCode().intValue()) {
 
                             /* 회원요약리스트에 임시회원요약리스트 추가해주기 */
                             tempMemberDataList.add(followerMemberDataList.get(k));
@@ -289,7 +285,7 @@ public class RecommendInfraQueryService {
             for (int k = 0; k < maxMemberCode; k++) {
 
                 /* 해당 멤버코드를 제외한 회원들을 조회한다. */
-                MemberData tempMemberData = memberDataDao.findByMemberCodeAndMemberCodeIsNotAndMemberRole((long) memberSize[k], memberCode, MemberRole.valueOf("ROLE_MEMBER"));
+                MemberData tempMemberData = memberDataDao.findByMemberCodeAndMemberCodeIsNotAndMemberRole((long) memberSize[k], memberCode, MemberRole.ROLE_MEMBER);
 
                 if (tempMemberData != null) {
 
@@ -297,7 +293,7 @@ public class RecommendInfraQueryService {
                     count++;
 
                     /* 6명이 되거나 최대회원수가 6명도 채 안되면 그 회원 수만큼만 조회하고 무한루프를 탈출한다. */
-                    if(count == (6) || count == maxMemberCode)  {
+                    if (count == (6) || count == maxMemberCode)  {
                         break;
                     }
                 }
@@ -314,7 +310,7 @@ public class RecommendInfraQueryService {
         }
 
         /* 자신의 아바타 정보 불러오기 */
-        if(avatarDataDao.findByMemberCode(memberCode) != null) {
+        if (avatarDataDao.findByMemberCode(memberCode) != null) {
 
             AvatarData ownAvatarData = avatarDataDao.findByMemberCode(memberCode);
             findRoomInMemberResponseDto.setOwnAvatarData(ownAvatarData);

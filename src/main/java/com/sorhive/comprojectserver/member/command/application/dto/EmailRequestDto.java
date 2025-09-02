@@ -1,9 +1,8 @@
 package com.sorhive.comprojectserver.member.command.application.dto;
 
-import lombok.Getter;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.Getter;
 
 /**
  * <pre>

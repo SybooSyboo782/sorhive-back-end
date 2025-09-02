@@ -1,7 +1,7 @@
 package com.sorhive.comprojectserver.feed.command.domain.repository;
 
-import com.sorhive.comprojectserver.feed.command.domain.model.feed.Feed;
-import org.springframework.data.repository.Repository;
+import com.sorhive.comprojectserver.feed.command.domain.model.Feed;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
@@ -19,12 +19,10 @@ import java.util.Optional;
  * @author 부시연(최초 작성자)
  * @version 1(클래스 버전)
  */
-public interface FeedRepository extends Repository<Feed, Long> {
+public interface FeedRepository extends JpaRepository<Feed, Long> {
 
     Feed findByFeedId(Long id);
 
-    void save(Feed feed);
-
-    Optional<Feed> findByFeedIdAndFeedDeleteYnEquals(Long feedId, char n);
+    Optional<Feed> findByFeedIdAndDeletedEquals(Long feedId, boolean deletedYn);
 
 }

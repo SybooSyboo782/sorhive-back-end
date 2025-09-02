@@ -1,9 +1,8 @@
 package com.sorhive.comprojectserver.room.query;
 
-import lombok.Getter;
-import org.hibernate.annotations.ColumnDefault;
-
+import com.sorhive.comprojectserver.common.entity.SoftDeleteEntity;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 /**
  * <pre>
@@ -23,7 +22,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "tbl_furniture_images")
 @Getter
-public class FurnitureImageData {
+public class FurnitureImageData extends SoftDeleteEntity {
 
     @Id
     @Column(name = "furniture_image_id")
@@ -38,9 +37,5 @@ public class FurnitureImageData {
 
     @Column(name = "fk_room_id")
     private Long roomId;
-
-    @Column(name = "furniture_delete_yn")
-    @ColumnDefault("'N'")
-    private Character deleteYn;
 
 }

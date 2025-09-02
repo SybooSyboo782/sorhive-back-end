@@ -102,7 +102,7 @@ public class ChattingQueryService {
         Long memberCode2 = Long.valueOf(tokenProvider.getUserCode(accessToken));
 
         /* membercode1은 작은값 membercode 2는 큰값으로 맞춘다. */
-        if(memberCode > memberCode2) {
+        if (memberCode > memberCode2) {
             Long temp = 0L;
             temp = memberCode;
             memberCode = memberCode2;

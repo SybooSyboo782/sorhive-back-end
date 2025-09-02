@@ -9,10 +9,11 @@ server:
 
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: RDBMS_URL
-    username: comproject
-    password: comproject
+    #driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: org.h2.Driver
+    #url: RDBMS_URL
+    #username: comproject
+    #password: comproject
     hikari:
       auto-commit: false
   servlet:
@@ -27,17 +28,27 @@ spring:
       enabled: true
   data:
     mongodb:
-      uri: NOSQL_URI
-      authentication-database: admin
+      #uri: NOSQL_URI
+      #uri: mongodb://localhost:27017/
+      host: localhost
+      port: 27017
       database: comproject
+      #authentication-database: admin
+      #database: comproject
+    web:
+      pageable:
+        default-page-size: 10
+        max-page-size: 2000
   jpa:
     generate-ddl: false
     show-sql: true
-    database: mysql
-    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    #database: mysql
+    #database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     properties:
       hibernate:
         format_sql: true
+        default_batch_fetch_size: 100
+        use_sql_comments: true
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
@@ -63,7 +74,8 @@ spring:
             enable: true
 
 jwt:
-  secret: JWT_SECRET
+  secret: Y29tcHJvamVjdHNlY3JldGtleTc4MmNvbXByb2plY3RzZWNyZXRrZXk=
+  #secret: JWT_SECRET
 
 logging:
   level:
@@ -93,3 +105,7 @@ mybatis:
   type-aliases-package: com.sorhive.comproject
   configuration:
     map-underscore-to-camel-case: true
+
+custom:
+  default-room-code: 637c67b716de470e1cecef26
+  default-mongoroom-code: 637befb055f63397c8692bb2

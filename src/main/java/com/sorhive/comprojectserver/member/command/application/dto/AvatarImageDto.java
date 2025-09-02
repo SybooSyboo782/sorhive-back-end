@@ -1,9 +1,8 @@
 package com.sorhive.comprojectserver.member.command.application.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import jakarta.validation.constraints.NotNull;
 
 /**
  * <pre>

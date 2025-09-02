@@ -35,7 +35,7 @@
           from tbl_lifing_image a
           join tbl_lifings b on a.lifing_id = b.lifing_id
          where a.lifing_learning_yn = 'N'
-           and a.lifing_delete_yn = 'N'
+           and a.deleted = false
            and not b.lifing_category_no = '-1';
     </select>
 

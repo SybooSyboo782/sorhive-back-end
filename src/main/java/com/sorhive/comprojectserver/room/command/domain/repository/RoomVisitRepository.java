@@ -1,6 +1,6 @@
 package com.sorhive.comprojectserver.room.command.domain.repository;
 
-import com.sorhive.comprojectserver.room.command.domain.roomvisit.RoomVisit;
+import com.sorhive.comprojectserver.room.command.domain.model.RoomVisit;
 import org.springframework.data.repository.Repository;
 
 /**

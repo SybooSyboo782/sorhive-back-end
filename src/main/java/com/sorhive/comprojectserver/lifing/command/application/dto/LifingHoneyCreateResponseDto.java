@@ -3,6 +3,7 @@ package com.sorhive.comprojectserver.lifing.command.application.dto;
 import lombok.Getter;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * <pre>
@@ -30,10 +31,10 @@ public class LifingHoneyCreateResponseDto {
 
     protected LifingHoneyCreateResponseDto() {}
 
-    public LifingHoneyCreateResponseDto(Long id, Long memberCode, Long lifingId, Timestamp createTime) {
+    public LifingHoneyCreateResponseDto(Long id, Long memberCode, Long lifingId, LocalDateTime createTime) {
         this.lifingHoneyId = id;
         this.memberCode = memberCode;
         this.lifingId = lifingId;
-        this.createTime = createTime;
+        this.createTime = Timestamp.valueOf(createTime);
     }
 }

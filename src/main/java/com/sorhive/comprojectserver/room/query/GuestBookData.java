@@ -1,13 +1,9 @@
 package com.sorhive.comprojectserver.room.query;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
-
+import com.sorhive.comprojectserver.common.entity.SoftDeleteEntity;
 import jakarta.persistence.*;
-import java.sql.Timestamp;
-import java.util.Date;
+import lombok.Getter;
 
 /**
  * <pre>
@@ -28,7 +24,7 @@ import java.util.Date;
 @Entity
 @Table(name = "tbl_guestbooks")
 @Getter
-public class GuestBookData {
+public class GuestBookData extends SoftDeleteEntity {
 
     @Id
     @Column(name="guestbook_id")
@@ -50,16 +46,5 @@ public class GuestBookData {
     @JsonIgnore
     @Column(name= "room_id")
     private Long roomId;
-
-    @Column(name = "guestbook_create_time")
-    @CreationTimestamp
-    private Date guestBookCreateTime;
-
-    @Column(name = "guestbook_upload_time")
-    private Timestamp guestBookUploadTime;
-
-    @Column(name = "guestbook_delete_yn")
-    @ColumnDefault("'N'")
-    private Character guestBookDeleteYn;
 
 }

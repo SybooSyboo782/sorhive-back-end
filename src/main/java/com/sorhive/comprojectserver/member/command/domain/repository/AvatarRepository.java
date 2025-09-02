@@ -1,7 +1,7 @@
 package com.sorhive.comprojectserver.member.command.domain.repository;
 
-import com.sorhive.comprojectserver.member.command.domain.model.avatar.Avatar;
-import org.springframework.data.repository.Repository;
+import com.sorhive.comprojectserver.member.command.domain.model.Avatar;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * <pre>
@@ -17,8 +17,6 @@ import org.springframework.data.repository.Repository;
  * @author 부시연(최초 작성자)
  * @version 1(클래스 버전)
  */
-public interface AvatarRepository extends Repository<Avatar, Long> {
-
-    void save(Avatar avatar);
+public interface AvatarRepository extends JpaRepository<Avatar, Long> {
 
 }

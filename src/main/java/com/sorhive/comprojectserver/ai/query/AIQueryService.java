@@ -1,6 +1,6 @@
 package com.sorhive.comprojectserver.ai.query;
 
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifingimage.LifingImage;
+import com.sorhive.comprojectserver.lifing.command.domain.model.LifingImage;
 import com.sorhive.comprojectserver.lifing.command.domain.repository.LifingImageRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +42,7 @@ public class AIQueryService {
 
         List<AILearningLifingResponseDto> aiLearningLifingResponseDtos = aiMapper.getAiLearningData();
 
-        if(!lifingImageRepository.findAllByLifingLearningYn('N').isEmpty()) {
+        if (!lifingImageRepository.findAllByLifingLearningYn('N').isEmpty()) {
 
             /* 학습에 제공한 라이핑 이미지들은 이미 배웠다고 표시한다. */
             List<LifingImage> lifingImages = lifingImageRepository.findAllByLifingLearningYn('N');

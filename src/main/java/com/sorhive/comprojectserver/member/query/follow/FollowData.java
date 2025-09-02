@@ -1,9 +1,9 @@
 package com.sorhive.comprojectserver.member.query.follow;
 
+import com.sorhive.comprojectserver.common.entity.SoftDeleteEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import jakarta.persistence.*;
 
 /**
  * <pre>
@@ -24,7 +24,7 @@ import jakarta.persistence.*;
 @Table(name = "tbl_follows")
 @Getter
 @NoArgsConstructor
-public class FollowData {
+public class FollowData extends SoftDeleteEntity {
 
     @Id
     @Column(name = "follow_id")
@@ -36,8 +36,5 @@ public class FollowData {
 
     @Column(name = "following_id")
     private Long followingId;
-
-    @Column(name = "follow_delete_yn")
-    private Character followDeleteYn;
 
 }

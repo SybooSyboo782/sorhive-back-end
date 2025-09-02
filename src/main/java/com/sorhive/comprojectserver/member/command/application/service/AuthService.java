@@ -6,7 +6,6 @@ import com.sorhive.comprojectserver.config.jwt.TokenProvider;
 import com.sorhive.comprojectserver.member.command.application.dto.LoginDto;
 import com.sorhive.comprojectserver.member.command.application.dto.SignUpDto;
 import com.sorhive.comprojectserver.member.command.domain.model.member.Member;
-import com.sorhive.comprojectserver.member.command.domain.model.member.MemberId;
 import com.sorhive.comprojectserver.member.command.domain.repository.MemberRepository;
 import com.sorhive.comprojectserver.member.command.exception.IdPatternNotMatchedException;
 import com.sorhive.comprojectserver.member.command.exception.LoginFailedException;
@@ -60,16 +59,16 @@ public class AuthService {
         log.info("[AuthService] Signup Start ===================================");
         log.info("[AuthService] signUpDto {}", signUpDto);
 
-        if(!customPattern.idPattern(signUpDto.getMemberId())) {
+        if (!customPattern.idPattern(signUpDto.getMemberId())) {
             throw new IdPatternNotMatchedException();
         }
 
-        if(!customPattern.passwordPattern(signUpDto.getPassword())) {
+        if (!customPattern.passwordPattern(signUpDto.getPassword())) {
             throw new PasswordPatternNotMatchedException();
         }
 
         Member member = new Member(
-                new MemberId(signUpDto.getMemberId()),
+                signUpDto.getMemberId(),
                 signUpDto.getMemberName(),
                 passwordEncoder.encode(signUpDto.getPassword())
         );
@@ -91,7 +90,7 @@ public class AuthService {
         Member member;
 
         /* 1. 아이디 조회 */
-        if(memberRepository.findByMemberId(loginDto.getMemberId()) != null){
+        if (memberRepository.findByMemberId(loginDto.getMemberId()) != null){
             member = memberRepository.findByMemberId(loginDto.getMemberId());
         } else {
             throw new LoginFailedException("잘못된 아이디 또는 비밀번호입니다");
@@ -121,7 +120,7 @@ public class AuthService {
 
         String idCheck = "";
 
-        if(memberRepository.findByMemberId(MemberId.of(newMemberId)) == null) {
+        if (memberRepository.findByMemberId(newMemberId) == null) {
             idCheck = "중복된 아이디가 없습니다";
         } else {
             idCheck = "중복된 아이디가 존재합니다 !";

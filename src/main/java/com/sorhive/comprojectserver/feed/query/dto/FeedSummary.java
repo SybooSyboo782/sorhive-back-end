@@ -24,7 +24,7 @@ import java.util.List;
 public class FeedSummary {
 
     private Long feedId;
-    private Character feedDeleteYn;
+    private boolean deleted;
     private String feedWriterName;
     private String feedWriterId;
     private String feedContent;

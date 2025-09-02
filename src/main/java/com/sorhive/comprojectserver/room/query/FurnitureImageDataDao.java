@@ -20,5 +20,5 @@ import java.util.List;
  * @see (참고할 class 또는 외부 url)
  */
 public interface FurnitureImageDataDao extends Repository<FurnitureImageData, Long> {
-    List<FurnitureImageData> findByRoomIdAndDeleteYnEquals(Long roomId, char n);
+    List<FurnitureImageData> findByRoomIdAndDeletedEquals(Long roomId, boolean deletedYn);
 }

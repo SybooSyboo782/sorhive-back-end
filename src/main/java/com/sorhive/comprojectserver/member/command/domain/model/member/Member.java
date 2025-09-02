@@ -1,12 +1,16 @@
 package com.sorhive.comprojectserver.member.command.domain.model.member;
+
+import com.sorhive.comprojectserver.common.entity.SoftDeleteEntity;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.Collection;
 
@@ -34,15 +38,16 @@ import java.util.Collection;
 @Table(name = "tbl_members")
 @DynamicInsert
 @DynamicUpdate
-public class Member implements UserDetails {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Member extends SoftDeleteEntity implements UserDetails {
 
     @Id
     @Column(name = "member_code")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberCode;
 
-    @Embedded
-    private MemberId memberId;
+    @Column(name = "member_id", unique = true)
+    private String memberId;
 
     @Column(name = "member_name")
     private String memberName;
@@ -57,19 +62,6 @@ public class Member implements UserDetails {
 
     @Column(name = "password")
     private String password;
-
-    @Column(name = "member_create_time")
-    private Timestamp createTime;
-
-    @Column(name = "member_upload_time")
-    private Timestamp uploadTime;
-
-    @Column(name = "member_delete_time")
-    private Timestamp deleteTime;
-
-    @Column(name = "member_delete_yn")
-    @ColumnDefault("'N'")
-    private Character deleteYn;
 
     @Column(name = "member_room_image")
     @ColumnDefault("''")
@@ -95,27 +87,19 @@ public class Member implements UserDetails {
     @ColumnDefault("'N'")
     private Character lifingYn;
 
-    protected Member() { }
-
-    public Member(MemberId memberId, String memberName, String password) {
+    public Member(String memberId, String memberName, String password) {
         this.memberId = memberId;
         this.memberName = memberName;
         this.password = password;
-        this.createTime = new Timestamp(System.currentTimeMillis());
-        this.uploadTime = new Timestamp(System.currentTimeMillis());
     }
     @Builder
-    public Member(Long memberCode, MemberId memberId, String memberName, String memberEmail, MemberRole memberRole, String password, Timestamp createTime, Timestamp uploadTime, Timestamp deleteTime, Character deleteYn, Collection<? extends GrantedAuthority> authorities) {
+    public Member(Long memberCode, String memberId, String memberName, String memberEmail, MemberRole memberRole, String password, Timestamp createTime, Timestamp uploadTime, Collection<? extends GrantedAuthority> authorities) {
         this.memberCode = memberCode;
         this.memberId = memberId;
         this.memberName = memberName;
         this.memberEmail = memberEmail;
         this.memberRole = memberRole;
         this.password = password;
-        this.createTime = createTime;
-        this.uploadTime = uploadTime;
-        this.deleteTime = deleteTime;
-        this.deleteYn = deleteYn;
         this.authorities = authorities;
     }
 
@@ -123,7 +107,7 @@ public class Member implements UserDetails {
         return memberCode;
     }
 
-    public MemberId getMemberId() { return memberId; }
+    public String getMemberId() { return memberId; }
 
     public String getMemberName() {
         return memberName;
@@ -134,22 +118,6 @@ public class Member implements UserDetails {
     }
 
     public MemberRole getMemberRole() { return memberRole; }
-
-    public Timestamp getCreateTime() {
-        return createTime;
-    }
-
-    public Timestamp getUploadTime() {
-        return uploadTime;
-    }
-
-    public Timestamp getDeleteTime() {
-        return deleteTime;
-    }
-
-    public Character getDeleteYn() {
-        return deleteYn;
-    }
 
     public String getRoomImagePath() { return roomImagePath; }
 
@@ -165,19 +133,16 @@ public class Member implements UserDetails {
 
     public void setRoomImagePath(String roomImagePath) {
         this.roomImagePath = roomImagePath;
-        this.uploadTime = new Timestamp(System.currentTimeMillis());
     }
 
     public void createAvatarImagePath(String avatarImagePath) {
         this.avatarImagePath = avatarImagePath;
         this.roomImagePath = "https://combucket.s3.ap-northeast-2.amazonaws.com/rooms/default_room.png";
-        this.uploadTime = new Timestamp(System.currentTimeMillis());
         this.avatarYn = 'Y';
     }
 
     public void setAvatarImagePath(String avatarImagePath) {
         this.avatarImagePath = avatarImagePath;
-        this.uploadTime = new Timestamp(System.currentTimeMillis());
     }
 
     /** AI가 분석한 사진이 존재 하는 라이핑 생성 */
@@ -185,7 +150,6 @@ public class Member implements UserDetails {
         this.lifingNo = lifingNo;
         this.lifingCategoryNo = lifingCategoryNo;
         this.lifingYn = 'Y';
-        this.uploadTime = new Timestamp(System.currentTimeMillis());
     }
 
     /** 그냥 사진만 올리는 라이핑 생성 */
@@ -193,7 +157,6 @@ public class Member implements UserDetails {
         this.lifingNo = -1L;
         this.lifingCategoryNo = -1L;
         this.lifingYn = 'Y';
-        this.uploadTime = new Timestamp(System.currentTimeMillis());
     }
 
     // 이하 코드는 security 를 위한 용도
@@ -209,11 +172,14 @@ public class Member implements UserDetails {
         return this.authorities;
     }
 
-    public String getPassword() { return password; }
+    @Override
+    public String getPassword() {
+        return password;
+    }
 
     @Override
     public String getUsername() {
-        return this.memberId.getId();
+        return this.memberId;
     }
 
     @Override
@@ -238,7 +204,6 @@ public class Member implements UserDetails {
 
     public void changePassword(String tempPassword) {
         this.password = tempPassword;
-        this.uploadTime = new Timestamp(System.currentTimeMillis());
     }
 
     public void updateMember(String name) {

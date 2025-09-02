@@ -1,9 +1,9 @@
 package com.sorhive.comprojectserver.lifing.command.application.dto;
 
-import com.sorhive.comprojectserver.lifing.command.domain.model.lifing.LifingWriter;
 import lombok.Getter;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * <pre>
@@ -28,18 +28,23 @@ public class LifingImageCreateAiResponseDto {
     private Long lifingId;
     private String lifingImagePath;
     private Long lifingCategoryNo;
-    private LifingWriter lifingWriter;
+    private Long memberCode;
+    private String lifingWriterName;
+    private String lifingWriterId;
     private Timestamp createTime;
 
     protected LifingImageCreateAiResponseDto() {}
 
-    public LifingImageCreateAiResponseDto(Long lifingId, Long analyzedLifingNo, LifingWriter lifingWriter, Timestamp createTime, String path) {
+    public LifingImageCreateAiResponseDto(Long lifingId, Long analyzedLifingNo, Long memberCode,
+                                          String lifingWriterName, String lifingWriterId, LocalDateTime createTime, String path) {
 
         this.lifingId = lifingId;
         this.lifingImagePath = path;
         this.lifingCategoryNo = analyzedLifingNo;
-        this.lifingWriter = lifingWriter;
-        this.createTime = createTime;
+        this.memberCode = memberCode;
+        this.lifingWriterName = lifingWriterName;
+        this.lifingWriterId = lifingWriterId;
+        this.createTime = Timestamp.valueOf(createTime);
 
     }
 }

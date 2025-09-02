@@ -1,9 +1,9 @@
 package com.sorhive.comprojectserver.feed.command.application.dto;
 
-import com.sorhive.comprojectserver.feed.command.domain.model.feed.FeedWriter;
 import lombok.Getter;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * <pre>
@@ -24,16 +24,20 @@ import java.sql.Timestamp;
 public class FeedModifyResponseDto {
 
     private Long feedId;
-    private FeedWriter feedWriter;
+    private Long memberCode;
+    private String feedWriterName;
+    private String feedWriterId;
     private String feedContent;
     private Timestamp feedUploadTime;
 
-    public FeedModifyResponseDto(Long feedId, FeedWriter feedWriter, String feedContent, Timestamp feedUploadTime) {
-
+    public FeedModifyResponseDto(Long feedId, String feedContent, Long memberCode, String feedWriterName,
+                                 String feedWriterId, LocalDateTime feedUploadTime) {
         this.feedId = feedId;
         this.feedContent = feedContent;
-        this.feedWriter = feedWriter;
-        this.feedUploadTime = feedUploadTime;
+        this.memberCode = memberCode;
+        this.feedWriterName = feedWriterName;
+        this.feedWriterId = feedWriterId;
+        this.feedUploadTime = Timestamp.valueOf(feedUploadTime);
 
     }
 }

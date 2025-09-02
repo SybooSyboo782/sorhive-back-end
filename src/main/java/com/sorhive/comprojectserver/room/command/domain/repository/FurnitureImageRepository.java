@@ -1,6 +1,6 @@
 package com.sorhive.comprojectserver.room.command.domain.repository;
 
-import com.sorhive.comprojectserver.room.command.domain.furnitureimage.FurnitureImage;
+import com.sorhive.comprojectserver.room.command.domain.model.FurnitureImage;
 import org.springframework.data.repository.Repository;
 
 /**

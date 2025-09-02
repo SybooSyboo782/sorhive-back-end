@@ -1,22 +1,19 @@
 package com.sorhive.comprojectserver.member.command.application.service;
 
 import com.sorhive.comprojectserver.config.jwt.TokenProvider;
-import com.sorhive.comprojectserver.member.command.domain.model.follow.Follow;
-import com.sorhive.comprojectserver.member.command.domain.model.follow.FollowerId;
-import com.sorhive.comprojectserver.member.command.domain.model.follow.FollowingId;
-import com.sorhive.comprojectserver.member.command.domain.model.member.MemberRole;
+import com.sorhive.comprojectserver.member.command.domain.model.Follow;
 import com.sorhive.comprojectserver.member.command.domain.repository.FollowRepository;
-import com.sorhive.comprojectserver.member.command.exception.ExistFollowException;
 import com.sorhive.comprojectserver.member.command.exception.NoFollowException;
 import com.sorhive.comprojectserver.member.command.exception.NoMemberException;
 import com.sorhive.comprojectserver.member.command.exception.SameMemberException;
+import com.sorhive.comprojectserver.member.query.member.MemberData;
 import com.sorhive.comprojectserver.member.query.member.MemberDataDao;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import static com.sorhive.comprojectserver.member.command.domain.model.member.MemberRole.ROLE_MEMBER;
 
 /**
  * <pre>
@@ -36,18 +33,14 @@ import java.util.Optional;
  * @version 1(클래스 버전)\
  */
 @Service
+@Slf4j
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class FollowService {
 
-    private static final Logger log = LoggerFactory.getLogger(FollowService.class);
     private final FollowRepository followRepository;
     private final MemberDataDao memberDataDao;
     private final TokenProvider tokenProvider;
-
-    public FollowService(FollowRepository followRepository, MemberDataDao memberDataDao, TokenProvider tokenProvider) {
-        this.followRepository = followRepository;
-        this.memberDataDao = memberDataDao;
-        this.tokenProvider = tokenProvider;
-    }
 
     /** 팔로우 추가 */
     @Transactional
@@ -57,27 +50,25 @@ public class FollowService {
 
         Long followerId = Long.valueOf(tokenProvider.getUserCode(accessToken));
 
-        if(followerId == followingId) {
+
+        MemberData follower = memberDataDao.findByMemberCodeAndMemberRole(followerId, ROLE_MEMBER)
+                .orElseThrow(() -> new NoMemberException("해당 회원이 존재하지 않습니다: " + followerId));
+
+        MemberData following = memberDataDao.findByMemberCodeAndMemberRole(followingId, ROLE_MEMBER)
+                .orElseThrow(() -> new NoMemberException("해당 회원이 존재하지 않습니다: " + followingId));
+
+        if (follower.equals(following)) {
             throw new SameMemberException("동일한 회원입니다.");
         }
 
-        if(memberDataDao.findByMemberCodeAndMemberRole(followingId, MemberRole.valueOf("ROLE_MEMBER")) == null) {
-            throw new NoMemberException("해당 회원이 존재하지 않습니다.");
-        }
-
-        if(!followRepository.findByFollowingId(new FollowerId(followerId), new FollowingId(followingId)).isEmpty()) {
-            throw new ExistFollowException("이미 팔로우를 하고 있습니다.");
-        }
-
         Follow follow = new Follow(
-                new FollowerId(followerId),
-                new FollowingId(followingId)
+                follower,
+                following
         );
 
         followRepository.save(follow);
 
         return follow.getFollowId();
-
     }
 
     /** 팔로우 제거 */
@@ -86,13 +77,10 @@ public class FollowService {
         log.info("[FollowService] deleteFollow Start ===============");
         log.info("[FollowService] followId : " + followId);
 
-        if(followRepository.findByFollowIdAndDeleteYnEquals(followId, 'N') == null) {
-            throw new NoFollowException("해당 팔로우 번호가 존재하지 않습니다.");
-        }
+        Follow follow = followRepository.findByFollowIdAndDeletedEquals(followId, false)
+                .orElseThrow(() -> new NoFollowException("해당 팔로우 번호가 존재하지 않습니다."));
 
-        Optional<Follow> followingData = followRepository.findByFollowIdAndDeleteYnEquals(followId, 'N');
-        Follow follow = followingData.get();
-        follow.setDeleteYn('Y');
+        follow.softDelete();
         followRepository.save(follow);
 
         return follow.getFollowId();

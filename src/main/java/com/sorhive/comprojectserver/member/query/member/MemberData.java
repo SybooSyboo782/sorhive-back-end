@@ -1,11 +1,12 @@
 package com.sorhive.comprojectserver.member.query.member;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sorhive.comprojectserver.common.entity.SoftDeleteEntity;
 import com.sorhive.comprojectserver.member.command.domain.model.member.MemberRole;
+import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
-
-import jakarta.persistence.*;
+import org.hibernate.annotations.Immutable;
 
 /**
  * <pre>
@@ -24,11 +25,11 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "tbl_members")
 @Getter
-public class MemberData {
+@Immutable
+public class MemberData extends SoftDeleteEntity {
 
     @Id
     @Column(name = "member_code")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberCode;
 
     @Column(name = "member_id")
@@ -36,10 +37,6 @@ public class MemberData {
 
     @Column(name = "member_name")
     private String name;
-
-    @Column(name = "member_delete_yn")
-    @ColumnDefault("N")
-    private Character deleteYn;
 
     @Column(name = "member_role")
     @Enumerated(EnumType.STRING)
